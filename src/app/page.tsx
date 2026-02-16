@@ -37,6 +37,7 @@ const Header = () => {
         <nav className="hidden md:flex gap-8 font-mono text-sm uppercase tracking-widest text-brand-bone">
           <Link href="#method" className="hover:text-brand-gold transition-colors">Method</Link>
           <Link href="#calculator" className="hover:text-brand-gold transition-colors">ROI</Link>
+          <Link href="/knowledge" className="hover:text-brand-gold transition-colors">Knowledge</Link>
           <Link href="#contact" className="hover:text-brand-gold transition-colors">Contact</Link>
         </nav>
       </div>
