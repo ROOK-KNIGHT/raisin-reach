@@ -31,7 +31,7 @@ const Header = () => {
     >
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link href="/" className="text-2xl font-display font-bold text-brand-gold tracking-tighter">
-          RAISIN RACH.
+          RAISIN REACH.
         </Link>
         <nav className="hidden md:flex gap-8 font-mono text-sm uppercase tracking-widest text-brand-bone">
           <Link href="#method" className="hover:text-brand-gold transition-colors">Method</Link>
@@ -151,7 +151,7 @@ const TheReachFactor = () => {
           <div className="aspect-[3/4] bg-brand-charcoal relative overflow-hidden grayscale contrast-125 border border-brutalist shadow-[8px_8px_0px_0px_var(--color-brand-gold)]">
              {/* Placeholder for Reach's Portrait */}
              <div className="absolute inset-0 flex items-center justify-center text-brand-bone opacity-20 text-9xl font-display font-bold">
-               RACH
+               REACH
              </div>
              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent text-white">
                 <p className="font-mono text-sm uppercase text-brand-gold">Founder & Lead Strategist</p>
