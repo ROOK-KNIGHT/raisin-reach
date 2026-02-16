@@ -1,26 +1,35 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --color-brand-plum: #3E1F47;
+  --color-brand-umber: #8B4513;
+  --color-brand-gold: #D4AF37;
+  --color-brand-bone: #F5F5F0;
+  --color-brand-charcoal: #333333;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-display: Space Grotesk, sans-serif;
+  --font-sans: Satoshi, Inter, sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --animate-liquid: liquid 10s linear infinite;
+
+  @keyframes liquid {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-50%, -50%); }
   }
+}
+
+:root {
+  --background: #F5F5F0; /* brand-bone */
+  --foreground: #333333; /* brand-charcoal */
+}
+
+/* Brutalist Utility */
+.border-brutalist {
+  border: 1px solid rgba(62, 31, 71, 0.2);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
