@@ -3,9 +3,20 @@
 import { useROICalculator } from "@/hooks/useROICalculator";
 import clsx from "clsx";
 import { motion, AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
 
-export default function ROICalculator() {
+interface ROICalculatorProps {
+  onRevenueUpdate?: (revenue: number) => void;
+}
+
+export default function ROICalculator({ onRevenueUpdate }: ROICalculatorProps) {
   const { inputs, setInput, results } = useROICalculator();
+
+  useEffect(() => {
+    if (onRevenueUpdate) {
+      onRevenueUpdate(results.revenue);
+    }
+  }, [results.revenue, onRevenueUpdate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, key: "leads" | "closeRate" | "dealValue") => {
     setInput(key, Number(e.target.value));

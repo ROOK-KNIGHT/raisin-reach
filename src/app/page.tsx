@@ -6,6 +6,7 @@ import ROICalculator from "@/components/shared/ROICalculator";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
+import { submitContactForm } from "@/app/actions";
 
 // --- Components ---
 
@@ -190,6 +191,8 @@ const TheReachFactor = () => {
 };
 
 export default function Home() {
+  const [projectedRevenue, setProjectedRevenue] = useState(0);
+
   return (
     <main className="bg-brand-bone min-h-screen">
       <Header />
@@ -222,7 +225,7 @@ export default function Home() {
             </p>
           </div>
           
-          <ROICalculator />
+          <ROICalculator onRevenueUpdate={setProjectedRevenue} />
 
           {/* AEO Snippet Box */}
           <div className="mt-12 p-6 bg-brand-plum/5 border border-brand-plum/10 rounded-lg max-w-2xl mx-auto">
@@ -245,25 +248,34 @@ export default function Home() {
             My calendar is limited. I only take on 3 new clients per quarter to maintain quality.
           </p>
           
-          <form className="max-w-md mx-auto space-y-4 bg-white p-8 border-2 border-brand-plum shadow-[8px_8px_0px_0px_var(--color-brand-plum)]">
+          <form 
+            action={submitContactForm}
+            className="max-w-md mx-auto space-y-4 bg-white p-8 border-2 border-brand-plum shadow-[8px_8px_0px_0px_var(--color-brand-plum)]"
+          >
+            <input type="hidden" name="projectedRevenue" value={projectedRevenue} />
             <input 
+              name="name"
               type="text" 
               placeholder="YOUR NAME" 
+              required
               className="w-full p-4 bg-brand-bone border border-brand-plum/20 placeholder-brand-plum/50 font-bold focus:outline-none focus:border-brand-plum"
             />
             <input 
+              name="email"
               type="email" 
               placeholder="WORK EMAIL" 
+              required
               className="w-full p-4 bg-brand-bone border border-brand-plum/20 placeholder-brand-plum/50 font-bold focus:outline-none focus:border-brand-plum"
             />
              <input 
+              name="goal"
               type="text" 
               placeholder="MONTHLY REVENUE GOAL" 
+              required
               className="w-full p-4 bg-brand-bone border border-brand-plum/20 placeholder-brand-plum/50 font-bold focus:outline-none focus:border-brand-plum"
             />
             <button 
-              type="button" 
-              onClick={() => window.location.href = "/success"}
+              type="submit" 
               className="w-full py-4 bg-brand-plum text-brand-gold font-bold uppercase tracking-widest hover:bg-brand-plum/90 transition-colors shadow-[4px_4px_0px_0px_var(--color-brand-gold)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-none active:translate-y-[4px] active:translate-x-[4px]"
             >
               Secure My Growth
