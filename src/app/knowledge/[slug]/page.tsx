@@ -12,8 +12,9 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const post = getKnowledgePost(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = getKnowledgePost(slug);
   if (!post) return;
 
   return {
@@ -22,8 +23,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default function KnowledgePost({ params }: { params: { slug: string } }) {
-  const post = getKnowledgePost(params.slug);
+export default async function KnowledgePost({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = getKnowledgePost(slug);
 
   if (!post) {
     notFound();
