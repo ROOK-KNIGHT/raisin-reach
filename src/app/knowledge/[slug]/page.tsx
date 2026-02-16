@@ -3,6 +3,8 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   const posts = getAllKnowledgePosts();
   return posts.map((post) => ({
