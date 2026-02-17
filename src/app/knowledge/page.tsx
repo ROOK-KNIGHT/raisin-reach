@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getAllKnowledgePosts } from "@/lib/mdx";
+import Header from "@/components/layout/Header";
 
 export const metadata = {
   title: "Knowledge Graph | RaisinReach",
@@ -10,7 +11,9 @@ export default function KnowledgeIndex() {
   const posts = getAllKnowledgePosts();
 
   return (
-    <main className="bg-brand-bone min-h-screen py-24 px-6">
+    <main className="bg-brand-bone min-h-screen">
+      <Header />
+      <div className="py-24 px-6">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-5xl md:text-7xl font-display font-bold text-brand-plum mb-16 uppercase tracking-tighter">
           Knowledge <span className="text-brand-gold">Graph</span>
@@ -38,6 +41,7 @@ export default function KnowledgeIndex() {
             </Link>
           ))}
         </div>
+      </div>
       </div>
     </main>
   );
