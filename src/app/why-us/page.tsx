@@ -87,6 +87,124 @@ export default function WhyUs() {
         </div>
       </section>
 
+      {/* The In-House Trap */}
+      <section className="py-24 px-6 max-w-6xl mx-auto">
+        <h2 className="text-3xl md:text-5xl font-display font-bold text-brand-plum mb-8 text-center">
+          The In-House Sales Team Trap.
+        </h2>
+        <p className="text-xl text-brand-charcoal/80 text-center max-w-3xl mx-auto mb-16">
+          "We'll just hire our own sales team." Famous last words. Here's what that actually costs.
+        </p>
+
+        <div className="grid md:grid-cols-2 gap-12 mb-16">
+          {/* Left: Cost Breakdown */}
+          <div className="bg-white border-2 border-brand-plum p-8 shadow-[8px_8px_0px_0px_var(--color-brand-plum)]">
+            <h3 className="text-2xl font-display font-bold text-brand-plum mb-6 uppercase">
+              Year 1 In-House Costs
+            </h3>
+            <div className="space-y-4 font-sans text-brand-charcoal">
+              <div className="flex justify-between border-b border-brand-plum/10 pb-2">
+                <span className="font-bold">Sales Rep Salary (2x)</span>
+                <span className="font-mono">$120,000</span>
+              </div>
+              <div className="flex justify-between border-b border-brand-plum/10 pb-2">
+                <span className="font-bold">Benefits & Taxes (30%)</span>
+                <span className="font-mono">$36,000</span>
+              </div>
+              <div className="flex justify-between border-b border-brand-plum/10 pb-2">
+                <span className="font-bold">CRM Software</span>
+                <span className="font-mono">$12,000</span>
+              </div>
+              <div className="flex justify-between border-b border-brand-plum/10 pb-2">
+                <span className="font-bold">Lead Data & Tools</span>
+                <span className="font-mono">$18,000</span>
+              </div>
+              <div className="flex justify-between border-b border-brand-plum/10 pb-2">
+                <span className="font-bold">Training & Onboarding</span>
+                <span className="font-mono">$8,000</span>
+              </div>
+              <div className="flex justify-between border-b border-brand-plum/10 pb-2">
+                <span className="font-bold">Office Space & Equipment</span>
+                <span className="font-mono">$15,000</span>
+              </div>
+              <div className="flex justify-between border-b border-brand-plum/10 pb-2">
+                <span className="font-bold">Sales Manager Oversight</span>
+                <span className="font-mono">$25,000</span>
+              </div>
+              <div className="flex justify-between pt-4 text-xl font-bold text-brand-plum">
+                <span>TOTAL YEAR 1</span>
+                <span className="font-mono">$234,000</span>
+              </div>
+            </div>
+            <p className="mt-6 text-sm text-brand-charcoal/60 italic">
+              * And that's assuming zero turnover, which is unrealistic in sales.
+            </p>
+          </div>
+
+          {/* Right: Hidden Costs */}
+          <div>
+            <h3 className="text-2xl font-display font-bold text-brand-plum mb-6 uppercase">
+              The Hidden Costs
+            </h3>
+            <div className="space-y-6 font-sans text-brand-charcoal">
+              <div>
+                <h4 className="font-bold text-lg text-brand-plum mb-2">⏱️ Ramp-Up Time</h4>
+                <p className="text-brand-charcoal/80">
+                  It takes 3-6 months for a new sales rep to become productive. That's half a year of paying someone to learn on your dime.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-lg text-brand-plum mb-2">🔄 Turnover</h4>
+                <p className="text-brand-charcoal/80">
+                  Average sales rep tenure is 18 months. When they leave, you start the cycle again: recruiting, hiring, training, ramping.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-lg text-brand-plum mb-2">📉 Inconsistent Performance</h4>
+                <p className="text-brand-charcoal/80">
+                  Even "good" reps have bad months. Your pipeline becomes a rollercoaster, making forecasting impossible.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-lg text-brand-plum mb-2">🎯 Management Overhead</h4>
+                <p className="text-brand-charcoal/80">
+                  Someone has to manage, coach, and hold reps accountable. That's either you (taking time from running the business) or another hire.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* The RaisinReach Alternative */}
+        <div className="bg-brand-plum text-brand-bone p-12 border-2 border-brand-gold shadow-[12px_12px_0px_0px_var(--color-brand-gold)]">
+          <h3 className="text-3xl font-display font-bold mb-6 text-center uppercase">
+            The RaisinReach Alternative
+          </h3>
+          <div className="grid md:grid-cols-3 gap-8 text-center">
+            <div>
+              <div className="text-5xl font-display font-bold text-brand-gold mb-2">$0</div>
+              <p className="font-mono text-sm uppercase tracking-widest">Hiring Costs</p>
+            </div>
+            <div>
+              <div className="text-5xl font-display font-bold text-brand-gold mb-2">$0</div>
+              <p className="font-mono text-sm uppercase tracking-widest">Training Time</p>
+            </div>
+            <div>
+              <div className="text-5xl font-display font-bold text-brand-gold mb-2">$0</div>
+              <p className="font-mono text-sm uppercase tracking-widest">Turnover Risk</p>
+            </div>
+          </div>
+          <div className="mt-8 text-center max-w-2xl mx-auto">
+            <p className="text-lg mb-4">
+              <strong className="text-brand-gold">Flat monthly retainer.</strong> Predictable costs. Immediate results.
+            </p>
+            <p className="text-brand-bone/80">
+              You get 20 years of sales mastery without the overhead, drama, or risk of building an in-house team.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-32 bg-brand-gold text-brand-plum text-center px-6">
         <div className="max-w-4xl mx-auto">
