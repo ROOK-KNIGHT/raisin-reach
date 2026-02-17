@@ -158,7 +158,7 @@ export default function WhatWeOffer() {
 
           <div className="mt-8 text-center">
             <p className="text-brand-bone/80 italic">
-              Exact pricing depends on your industry, deal size, and target volume. Let's talk.
+              Fixed pricing. Same guarantee for all clients. Let's talk.
             </p>
           </div>
         </div>
