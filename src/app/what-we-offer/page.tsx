@@ -139,6 +139,95 @@ export default function WhatWeOffer() {
         </div>
       </section>
 
+      {/* What Happens After You Sign Up */}
+      <section className="py-24 px-6 max-w-6xl mx-auto">
+        <h2 className="text-4xl font-display font-bold text-brand-plum mb-12 uppercase text-center">
+          What Happens After You Sign Up
+        </h2>
+        
+        <div className="bg-brand-plum text-brand-bone p-12 mb-12 border-2 border-brand-gold shadow-[12px_12px_0px_0px_var(--color-brand-gold)]">
+          <p className="text-xl font-sans text-center mb-8 leading-relaxed">
+            We become your <strong className="text-brand-gold">dedicated outbound sales arm</strong>, operating as an extension of your team—identifying, engaging, and qualifying prospects on your behalf, every single day.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-12 mb-16">
+          {/* Daily Operations */}
+          <div className="bg-white border-2 border-brand-plum p-8 shadow-[8px_8px_0px_0px_var(--color-brand-plum)]">
+            <h3 className="text-2xl font-display font-bold text-brand-plum mb-6 uppercase">Daily Operations</h3>
+            <div className="space-y-6 font-sans text-brand-charcoal">
+              <div>
+                <h4 className="font-bold text-lg text-brand-plum mb-2">Strategic Prospecting</h4>
+                <p className="text-brand-charcoal/80">
+                  We identify and research decision-makers within your target market, building a pipeline of high-value prospects aligned with your ideal customer profile.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-lg text-brand-plum mb-2">Human-Centric Outreach</h4>
+                <p className="text-brand-charcoal/80">
+                  Acting on your behalf, we initiate conversations with prospects—no scripts, no spam. Just authentic, consultative dialogue that positions your value proposition.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-lg text-brand-plum mb-2">Multi-Touch Engagement</h4>
+                <p className="text-brand-charcoal/80">
+                  We orchestrate discovery calls, exploratory meetings, proposal discussions, and RFI/RFP coordination—whatever the next logical step is to advance the opportunity.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Follow-Up & Pipeline Management */}
+          <div className="bg-white border-2 border-brand-plum p-8 shadow-[8px_8px_0px_0px_var(--color-brand-plum)]">
+            <h3 className="text-2xl font-display font-bold text-brand-plum mb-6 uppercase">Follow-Up & Pipeline Management</h3>
+            <div className="space-y-6 font-sans text-brand-charcoal">
+              <div>
+                <h4 className="font-bold text-lg text-brand-plum mb-2">Relentless Follow-Through</h4>
+                <p className="text-brand-charcoal/80">
+                  We track every conversation, nurture every lead, and follow up systematically. No prospect falls through the cracks.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-lg text-brand-plum mb-2">Qualification & Vetting</h4>
+                <p className="text-brand-charcoal/80">
+                  Before any handoff, we confirm Budget, Authority, Need, and Timeline. You only speak with prospects who are ready, willing, and able to buy.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-lg text-brand-plum mb-2">Warm, Primed Handoffs</h4>
+                <p className="text-brand-charcoal/80">
+                  When we schedule an appointment, the prospect knows who you are, why you're calling, and what problem you solve. They're expecting your call.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* The Consistency Advantage */}
+        <div className="bg-brand-bone p-12 border-2 border-brand-plum">
+          <h3 className="text-3xl font-display font-bold text-brand-plum mb-6 text-center uppercase">
+            The Consistency Advantage
+          </h3>
+          <div className="max-w-3xl mx-auto space-y-6 font-sans text-lg text-brand-charcoal">
+            <p>
+              <strong className="text-brand-plum">Volume is a vanity metric.</strong> What separates elite sales operations from mediocre ones isn't the number of dials—it's the <strong className="text-brand-plum">discipline of daily execution</strong> and the <strong className="text-brand-plum">precision of persistent follow-up</strong>.
+            </p>
+            <p>
+              Most in-house teams start strong, then fade. Reps get distracted. Priorities shift. Follow-ups slip. The pipeline dries up.
+            </p>
+            <p className="text-xl font-bold text-brand-plum">
+              We show up every single day. Same intensity. Same focus. Same results.
+            </p>
+            <p>
+              This isn't about making more calls—it's about making the <strong>right calls</strong>, at the <strong>right time</strong>, with the <strong>right message</strong>, and following through until the opportunity converts or disqualifies.
+            </p>
+            <p className="pt-6 border-t-2 border-brand-plum/20 italic text-brand-charcoal/80">
+              Your pipeline doesn't grow from heroic effort. It grows from <strong className="text-brand-plum">relentless consistency</strong>—and that's what we deliver.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing Structure */}
       <section className="py-24 px-6 max-w-4xl mx-auto">
         <h2 className="text-4xl font-display font-bold text-brand-plum mb-12 uppercase text-center">
