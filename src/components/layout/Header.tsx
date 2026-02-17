@@ -34,7 +34,7 @@ export default function Header() {
           
           {/* Desktop Nav */}
           <nav className="hidden md:flex gap-8 font-mono text-sm uppercase tracking-widest text-brand-bone">
-            <Link href="/#method" className="hover:text-brand-gold transition-colors">Method</Link>
+            <Link href="/what-we-offer" className="hover:text-brand-gold transition-colors">What We Offer</Link>
             <Link href="/why-us" className="hover:text-brand-gold transition-colors">Why Us</Link>
             <Link href="/#calculator" className="hover:text-brand-gold transition-colors">ROI</Link>
             <Link href="/knowledge" className="hover:text-brand-gold transition-colors">Knowledge</Link>
@@ -61,7 +61,7 @@ export default function Header() {
           className="fixed top-[72px] left-0 right-0 z-40 bg-brand-plum border-b border-brand-gold/20 md:hidden"
         >
           <nav className="flex flex-col gap-4 p-6 font-mono text-sm uppercase tracking-widest text-brand-bone">
-            <Link href="/#method" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold transition-colors py-2">Method</Link>
+            <Link href="/what-we-offer" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold transition-colors py-2">What We Offer</Link>
             <Link href="/why-us" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold transition-colors py-2">Why Us</Link>
             <Link href="/#calculator" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold transition-colors py-2">ROI</Link>
             <Link href="/knowledge" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold transition-colors py-2">Knowledge</Link>
