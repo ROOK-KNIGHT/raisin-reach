@@ -46,6 +46,10 @@ export default function WhatWeOffer() {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-brand-gold font-bold mt-1">→</span>
+                  <span><strong>Protected territory:</strong> One client per vertical. Your competitors will never receive our services.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-brand-gold font-bold mt-1">→</span>
                   <span><strong>Warm handoff:</strong> Prospect expects your call and knows why you're reaching out</span>
                 </li>
                 <li className="flex items-start gap-3">
