@@ -148,25 +148,25 @@ export default function WhyUs() {
             </h3>
             <div className="space-y-6 font-sans text-brand-charcoal">
               <div>
-                <h4 className="font-bold text-lg text-brand-plum mb-2">⏱️ Ramp-Up Time</h4>
+                <h4 className="font-bold text-lg text-brand-plum mb-2">Ramp-Up Time</h4>
                 <p className="text-brand-charcoal/80">
                   It takes 3-6 months for a new sales rep to become productive. That's half a year of paying someone to learn on your dime.
                 </p>
               </div>
               <div>
-                <h4 className="font-bold text-lg text-brand-plum mb-2">🔄 Turnover</h4>
+                <h4 className="font-bold text-lg text-brand-plum mb-2">Turnover</h4>
                 <p className="text-brand-charcoal/80">
                   Average sales rep tenure is 18 months. When they leave, you start the cycle again: recruiting, hiring, training, ramping.
                 </p>
               </div>
               <div>
-                <h4 className="font-bold text-lg text-brand-plum mb-2">📉 Inconsistent Performance</h4>
+                <h4 className="font-bold text-lg text-brand-plum mb-2">Inconsistent Performance</h4>
                 <p className="text-brand-charcoal/80">
                   Even "good" reps have bad months. Your pipeline becomes a rollercoaster, making forecasting impossible.
                 </p>
               </div>
               <div>
-                <h4 className="font-bold text-lg text-brand-plum mb-2">🎯 Management Overhead</h4>
+                <h4 className="font-bold text-lg text-brand-plum mb-2">Management Overhead</h4>
                 <p className="text-brand-charcoal/80">
                   Someone has to manage, coach, and hold reps accountable. That's either you (taking time from running the business) or another hire.
                 </p>
@@ -200,6 +200,79 @@ export default function WhyUs() {
             </p>
             <p className="text-brand-bone/80">
               You get 20 years of sales mastery without the overhead, drama, or risk of building an in-house team.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Market Testing & Expansion */}
+      <section className="py-24 bg-white border-y border-brutalist">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-3xl md:text-5xl font-display font-bold text-brand-plum mb-8 text-center">
+            Test New Markets Without the Risk.
+          </h2>
+          <p className="text-xl text-brand-charcoal/80 text-center max-w-3xl mx-auto mb-16">
+            Launching a new service line? Entering a new vertical? Testing a subscription model? Don't hire a team until you know it works.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            {/* Scenario 1 */}
+            <div className="bg-brand-bone p-8 border-2 border-brand-plum shadow-[6px_6px_0px_0px_var(--color-brand-plum)]">
+              <h3 className="text-xl font-display font-bold text-brand-plum mb-4 uppercase">
+                New Service Launch
+              </h3>
+              <p className="text-brand-charcoal/80 mb-4">
+                You've built a new offering but don't know if the market wants it. Hiring a sales team is a $200K+ bet.
+              </p>
+              <div className="bg-brand-plum text-brand-bone p-4 font-mono text-sm">
+                <strong className="text-brand-gold">RaisinReach Approach:</strong> We run a 90-day pilot. 30 qualified appointments. If it converts, scale. If not, pivot. Zero sunk cost.
+              </div>
+            </div>
+
+            {/* Scenario 2 */}
+            <div className="bg-brand-bone p-8 border-2 border-brand-plum shadow-[6px_6px_0px_0px_var(--color-brand-plum)]">
+              <h3 className="text-xl font-display font-bold text-brand-plum mb-4 uppercase">
+                New Market Entry
+              </h3>
+              <p className="text-brand-charcoal/80 mb-4">
+                You want to expand into healthcare, finance, or manufacturing. But you don't know the language, pain points, or buyers yet.
+              </p>
+              <div className="bg-brand-plum text-brand-bone p-4 font-mono text-sm">
+                <strong className="text-brand-gold">RaisinReach Approach:</strong> We learn the vertical, test messaging, and deliver qualified conversations. You decide if it's worth building a dedicated team.
+              </div>
+            </div>
+
+            {/* Scenario 3 */}
+            <div className="bg-brand-bone p-8 border-2 border-brand-plum shadow-[6px_6px_0px_0px_var(--color-brand-plum)]">
+              <h3 className="text-xl font-display font-bold text-brand-plum mb-4 uppercase">
+                Subscription Model Test
+              </h3>
+              <p className="text-brand-charcoal/80 mb-4">
+                You're moving from project-based to recurring revenue. The sales motion is completely different. Your current team isn't trained for it.
+              </p>
+              <div className="bg-brand-plum text-brand-bone p-4 font-mono text-sm">
+                <strong className="text-brand-gold">RaisinReach Approach:</strong> We handle the "land" (initial sale). You handle the "expand" (upsell/retention). Prove the model before retraining your team.
+              </div>
+            </div>
+          </div>
+
+          {/* The Strategic Advantage */}
+          <div className="bg-brand-plum text-brand-bone p-12 max-w-4xl mx-auto">
+            <h3 className="text-2xl font-display font-bold mb-6 text-center uppercase text-brand-gold">
+              The Strategic Advantage
+            </h3>
+            <div className="grid md:grid-cols-2 gap-8 text-center">
+              <div>
+                <div className="text-5xl font-display font-bold text-brand-gold mb-2">90 Days</div>
+                <p className="font-mono text-sm uppercase tracking-widest">To Validate or Kill an Idea</p>
+              </div>
+              <div>
+                <div className="text-5xl font-display font-bold text-brand-gold mb-2">$0</div>
+                <p className="font-mono text-sm uppercase tracking-widest">Wasted on Bad Hires</p>
+              </div>
+            </div>
+            <p className="mt-8 text-center text-lg">
+              Most businesses fail because they commit too early. <strong className="text-brand-gold">We let you test, learn, and pivot</strong> without the financial anchor of full-time headcount.
             </p>
           </div>
         </div>
