@@ -72,7 +72,7 @@ export default function WhatWeOffer() {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-brand-charcoal/40 font-bold mt-1">✕</span>
-                  <span>Charge per lead (we work on retainer + performance)</span>
+                  <span>Charge per lead (we work on flat retainer)</span>
                 </li>
               </ul>
             </div>
@@ -144,15 +144,12 @@ export default function WhatWeOffer() {
         <div className="bg-brand-plum text-brand-bone p-12 border-2 border-brand-gold shadow-[12px_12px_0px_0px_var(--color-brand-gold)]">
           <div className="text-center mb-8">
             <div className="text-6xl font-display font-bold text-brand-gold mb-4">Flat Retainer</div>
-            <p className="text-xl">+ Performance Bonus</p>
+            <p className="text-xl">One price. Predictable. Simple.</p>
           </div>
 
           <div className="space-y-4 font-sans text-lg">
             <p>
-              <strong className="text-brand-gold">Monthly Retainer:</strong> Covers research, outreach, qualification, and scheduling infrastructure.
-            </p>
-            <p>
-              <strong className="text-brand-gold">Performance Bonus:</strong> Paid per qualified appointment delivered (ensures we're aligned on results).
+              <strong className="text-brand-gold">Monthly Retainer:</strong> Covers research, outreach, qualification, scheduling infrastructure, and all qualified appointments delivered.
             </p>
             <p className="pt-4 border-t border-brand-gold/20">
               <strong className="text-brand-gold">Minimum Commitment:</strong> 90 days. This gives us time to learn your market and optimize messaging.
@@ -185,7 +182,7 @@ export default function WhatWeOffer() {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-brand-gold font-bold mt-1">✓</span>
-                  <span>Service businesses (consulting, SaaS, agencies)</span>
+                  <span>Service businesses (consulting, SaaS, agencies, contractors)</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-brand-gold font-bold mt-1">✓</span>
