@@ -53,7 +53,7 @@ export default async function KnowledgePost({ params }: { params: Promise<{ slug
             </div>
           </header>
 
-          <div className="prose prose-lg prose-headings:font-display prose-headings:text-brand-plum prose-p:font-sans prose-p:text-brand-charcoal prose-strong:text-brand-plum prose-a:text-brand-gold hover:prose-a:text-brand-plum">
+          <div className="prose prose-lg prose-headings:font-display prose-headings:text-brand-plum prose-p:font-sans prose-p:text-brand-charcoal prose-strong:text-brand-plum prose-a:text-brand-gold hover:prose-a:text-brand-plum prose-table:border-collapse prose-table:w-full prose-th:bg-brand-plum prose-th:text-brand-gold prose-th:font-display prose-th:uppercase prose-th:tracking-wider prose-th:p-4 prose-th:text-left prose-td:border prose-td:border-brand-plum/20 prose-td:p-4 prose-td:font-sans prose-tr:even:bg-brand-bone">
             <MDXRemote source={post.content} />
           </div>
 
