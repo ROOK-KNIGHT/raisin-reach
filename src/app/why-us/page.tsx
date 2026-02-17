@@ -74,7 +74,7 @@ export default function WhyUs() {
                 <tr className="border-b border-brand-plum/10">
                   <td className="py-6 px-6 font-bold">Cost Model</td>
                   <td className="py-6 px-6 bg-gray-50">Per Lead (Sold multiple times)</td>
-                  <td className="py-6 px-6 bg-brand-plum/5 font-bold text-brand-plum">Flat Retainer + Performance</td>
+                  <td className="py-6 px-6 bg-brand-plum/5 font-bold text-brand-plum">Flat Monthly Retainer</td>
                 </tr>
                 <tr>
                   <td className="py-6 px-6 font-bold">Outcome</td>
