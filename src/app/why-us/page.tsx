@@ -175,10 +175,10 @@ export default function WhyUs() {
           </div>
         </div>
 
-        {/* The RaisinReach Alternative */}
+        {/* The Raisin Reach Alternative */}
         <div className="bg-brand-plum text-brand-bone p-12 border-2 border-brand-gold shadow-[12px_12px_0px_0px_var(--color-brand-gold)]">
           <h3 className="text-3xl font-display font-bold mb-6 text-center uppercase">
-            The RaisinReach Alternative
+            The Raisin Reach Alternative
           </h3>
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
