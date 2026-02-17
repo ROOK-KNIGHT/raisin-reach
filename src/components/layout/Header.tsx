@@ -36,7 +36,7 @@ export default function Header() {
           <nav className="hidden md:flex gap-8 font-mono text-sm uppercase tracking-widest text-brand-bone">
             <Link href="/what-we-offer" className="hover:text-brand-gold transition-colors">What We Offer</Link>
             <Link href="/why-us" className="hover:text-brand-gold transition-colors">Why Us</Link>
-            <Link href="/#calculator" className="hover:text-brand-gold transition-colors">ROI</Link>
+            <Link href="/industry-availability" className="hover:text-brand-gold transition-colors">Industries</Link>
             <Link href="/knowledge" className="hover:text-brand-gold transition-colors">Knowledge</Link>
             <Link href="/#contact" className="hover:text-brand-gold transition-colors">Contact</Link>
           </nav>
@@ -63,7 +63,7 @@ export default function Header() {
           <nav className="flex flex-col gap-4 p-6 font-mono text-sm uppercase tracking-widest text-brand-bone">
             <Link href="/what-we-offer" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold transition-colors py-2">What We Offer</Link>
             <Link href="/why-us" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold transition-colors py-2">Why Us</Link>
-            <Link href="/#calculator" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold transition-colors py-2">ROI</Link>
+            <Link href="/industry-availability" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold transition-colors py-2">Industries</Link>
             <Link href="/knowledge" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold transition-colors py-2">Knowledge</Link>
             <Link href="/#contact" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold transition-colors py-2">Contact</Link>
           </nav>
