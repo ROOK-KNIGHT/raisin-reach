@@ -48,6 +48,8 @@ export default function PortalDashboard() {
   useEffect(() => {
     if (status === "authenticated") {
       fetchDashboardData();
+    } else if (status === "unauthenticated") {
+      setLoading(false);
     }
   }, [status]);
 

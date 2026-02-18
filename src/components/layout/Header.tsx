@@ -39,6 +39,7 @@ export default function Header() {
             <Link href="/industry-availability" className="hover:text-brand-gold transition-colors">Industries</Link>
             <Link href="/knowledge" className="hover:text-brand-gold transition-colors">Knowledge</Link>
             <Link href="/portal" className="hover:text-brand-gold transition-colors">Portal</Link>
+            <Link href="/auth/signin" className="hover:text-brand-gold transition-colors">Login</Link>
             <Link href="/#contact" className="hover:text-brand-gold transition-colors">Contact</Link>
           </nav>
 
@@ -67,6 +68,7 @@ export default function Header() {
             <Link href="/industry-availability" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold transition-colors py-2">Industries</Link>
             <Link href="/knowledge" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold transition-colors py-2">Knowledge</Link>
             <Link href="/portal" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold transition-colors py-2">Portal</Link>
+            <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold transition-colors py-2">Login</Link>
             <Link href="/#contact" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold transition-colors py-2">Contact</Link>
           </nav>
         </motion.div>
