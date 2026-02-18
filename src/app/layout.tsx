@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import clsx from "clsx";
+import SessionProvider from "@/components/providers/SessionProvider";
 
 // Fonts
 const spaceGrotesk = Space_Grotesk({
@@ -71,7 +72,7 @@ export default function RootLayout({
           "antialiased bg-brand-bone text-brand-charcoal font-sans"
         )}
       >
-        {children}
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );

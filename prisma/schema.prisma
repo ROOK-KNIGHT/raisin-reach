@@ -1,0 +1,204 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth.js Models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model User {
+  id                String    @id @default(cuid())
+  name              String?
+  email             String    @unique
+  emailVerified     DateTime?
+  image             String?
+  password          String?   // For email/password auth
+  twoFactorEnabled  Boolean   @default(false)
+  twoFactorSecret   String?
+  
+  // Client-specific fields
+  company           String?
+  industry          String?
+  membershipStatus  MembershipStatus @default(ACTIVE)
+  membershipTier    String?   @default("standard")
+  joinedAt          DateTime  @default(now())
+  cancelledAt       DateTime?
+  
+  accounts          Account[]
+  sessions          Session[]
+  callLogs          CallLog[]
+  leads             Lead[]
+  focusAreas        FocusArea[]
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([email])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Client Portal Models
+model CallLog {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  prospectName    String
+  prospectCompany String?
+  prospectPhone   String?
+  prospectEmail   String?
+  
+  callDate        DateTime @default(now())
+  callDuration    Int?     // in seconds
+  callOutcome     CallOutcome
+  notes           String?  @db.Text
+  followUpDate    DateTime?
+  
+  leadId          String?
+  lead            Lead?    @relation(fields: [leadId], references: [id])
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@index([callDate])
+  @@index([leadId])
+}
+
+model Lead {
+  id              String     @id @default(cuid())
+  userId          String
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  companyName     String
+  contactName     String
+  contactTitle    String?
+  contactEmail    String?
+  contactPhone    String?
+  
+  status          LeadStatus @default(NEW)
+  source          String?
+  industry        String?
+  
+  // BANT Qualification
+  budget          String?
+  authority       String?
+  need            String?    @db.Text
+  timeline        String?
+  
+  notes           String?    @db.Text
+  nextAction      String?
+  nextActionDate  DateTime?
+  
+  callLogs        CallLog[]
+  
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model FocusArea {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title       String
+  description String?  @db.Text
+  priority    Priority @default(MEDIUM)
+  isActive    Boolean  @default(true)
+  
+  // Target criteria
+  targetIndustry    String?
+  targetCompanySize String?
+  targetLocation    String?
+  targetJobTitles   String[] // Array of job titles to target
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([isActive])
+}
+
+// Enums
+enum MembershipStatus {
+  ACTIVE
+  CANCELLED
+  SUSPENDED
+  TRIAL
+}
+
+enum CallOutcome {
+  CONNECTED
+  VOICEMAIL
+  NO_ANSWER
+  WRONG_NUMBER
+  GATEKEEPER
+  SCHEDULED_MEETING
+  NOT_INTERESTED
+  CALLBACK_REQUESTED
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  MEETING_SCHEDULED
+  PROPOSAL_SENT
+  NEGOTIATION
+  WON
+  LOST
+  NURTURE
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
