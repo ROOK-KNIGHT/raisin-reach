@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ laborRates }, { status: 200 });
+    return NextResponse.json(laborRates, { status: 200 });
   } catch (error) {
     console.error("Error fetching labor rates:", error);
     return NextResponse.json(
@@ -53,10 +53,10 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { roleName, hourlyRate, isActive } = body;
+    const { role, hourlyRate } = body;
 
     // Validation
-    if (!roleName || hourlyRate === undefined) {
+    if (!role || hourlyRate === undefined) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -73,13 +73,12 @@ export async function POST(req: NextRequest) {
     const laborRate = await prisma.laborRate.create({
       data: {
         userId: user.id,
-        roleName,
+        role,
         hourlyRate: parseFloat(hourlyRate),
-        isActive: isActive !== undefined ? isActive : true,
       },
     });
 
-    return NextResponse.json({ laborRate }, { status: 201 });
+    return NextResponse.json(laborRate, { status: 201 });
   } catch (error) {
     console.error("Error creating labor rate:", error);
     return NextResponse.json(
@@ -107,7 +106,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { id, roleName, hourlyRate, isActive } = body;
+    const { id, role, hourlyRate } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -135,13 +134,12 @@ export async function PUT(req: NextRequest) {
     const laborRate = await prisma.laborRate.update({
       where: { id },
       data: {
-        ...(roleName && { roleName }),
+        ...(role && { role }),
         ...(hourlyRate !== undefined && { hourlyRate: parseFloat(hourlyRate) }),
-        ...(isActive !== undefined && { isActive }),
       },
     });
 
-    return NextResponse.json({ laborRate }, { status: 200 });
+    return NextResponse.json(laborRate, { status: 200 });
   } catch (error) {
     console.error("Error updating labor rate:", error);
     return NextResponse.json(
