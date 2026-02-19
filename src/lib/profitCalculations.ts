@@ -4,7 +4,8 @@
  * This module provides calculation functions for the Profit Estimator tool.
  */
 
-export type Frequency = "DAILY" | "WEEKLY" | "MONTHLY" | "QUARTERLY" | "ANNUALLY";
+export type Frequency = "WEEKLY" | "MONTHLY" | "QUARTERLY" | "YEARLY";
+export type TimePeriod = "WEEKLY" | "MONTHLY" | "QUARTERLY" | "YEARLY";
 
 /**
  * Calculate gross profit (revenue minus direct costs)
@@ -65,13 +66,34 @@ export function calculateBreakEven(
  */
 export function annualizeAmount(amount: number, frequency: Frequency): number {
   const multipliers: Record<Frequency, number> = {
-    DAILY: 365,
     WEEKLY: 52,
     MONTHLY: 12,
     QUARTERLY: 4,
-    ANNUALLY: 1,
+    YEARLY: 1,
   };
   return amount * multipliers[frequency];
+}
+
+/**
+ * Convert an amount from one frequency to another
+ */
+export function convertAmount(
+  amount: number,
+  fromFrequency: Frequency,
+  toFrequency: TimePeriod
+): number {
+  // First convert to annual
+  const annual = annualizeAmount(amount, fromFrequency);
+  
+  // Then convert to target frequency
+  const divisors: Record<TimePeriod, number> = {
+    WEEKLY: 52,
+    MONTHLY: 12,
+    QUARTERLY: 4,
+    YEARLY: 1,
+  };
+  
+  return annual / divisors[toFrequency];
 }
 
 /**

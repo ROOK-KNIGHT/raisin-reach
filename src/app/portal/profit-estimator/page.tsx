@@ -66,6 +66,7 @@ export default function ProfitEstimatorPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>("dashboard");
   const [loading, setLoading] = useState(true);
+  const [timePeriod, setTimePeriod] = useState<"WEEKLY" | "MONTHLY" | "QUARTERLY" | "YEARLY">("MONTHLY");
   
   // Data states
   const [projects, setProjects] = useState<Project[]>([]);
@@ -238,6 +239,26 @@ export default function ProfitEstimatorPage() {
     }
   };
 
+  const convertToTimePeriod = (annualAmount: number) => {
+    const divisors = {
+      WEEKLY: 52,
+      MONTHLY: 12,
+      QUARTERLY: 4,
+      YEARLY: 1,
+    };
+    return annualAmount / divisors[timePeriod];
+  };
+
+  const getTimePeriodLabel = () => {
+    const labels = {
+      WEEKLY: "Weekly",
+      MONTHLY: "Monthly",
+      QUARTERLY: "Quarterly",
+      YEARLY: "Yearly",
+    };
+    return labels[timePeriod];
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -353,6 +374,23 @@ export default function ProfitEstimatorPage() {
         {/* Dashboard Tab */}
         {activeTab === "dashboard" && (
           <>
+            {/* Time Period Selector */}
+            <div className="mb-6 flex items-center justify-end gap-4">
+              <label className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60">
+                View By:
+              </label>
+              <select
+                value={timePeriod}
+                onChange={(e) => setTimePeriod(e.target.value as any)}
+                className="px-4 py-2 border-2 border-brand-plum text-brand-plum font-mono text-sm uppercase tracking-widest focus:outline-none focus:border-brand-gold"
+              >
+                <option value="WEEKLY">Weekly</option>
+                <option value="MONTHLY">Monthly</option>
+                <option value="QUARTERLY">Quarterly</option>
+                <option value="YEARLY">Yearly</option>
+              </select>
+            </div>
+
             {!calculations ? (
               <div className="bg-white border-2 border-brand-plum p-12 text-center">
                 <p className="text-brand-charcoal/60 font-mono uppercase tracking-widest mb-4">
@@ -378,18 +416,18 @@ export default function ProfitEstimatorPage() {
             {/* Summary Cards */}
             <div className="grid md:grid-cols-4 gap-6">
               <SummaryCard
-                title="Total Revenue"
-                value={formatCurrency(calculations.totalRevenue)}
+                title={`${getTimePeriodLabel()} Revenue`}
+                value={formatCurrency(convertToTimePeriod(calculations.totalRevenue))}
                 trend={calculations.totalRevenue > 0 ? "up" : "neutral"}
               />
               <SummaryCard
-                title="Gross Profit"
-                value={formatCurrency(calculations.grossProfit)}
+                title={`${getTimePeriodLabel()} Gross Profit`}
+                value={formatCurrency(convertToTimePeriod(calculations.grossProfit))}
                 trend={calculations.grossProfit > 0 ? "up" : "down"}
               />
               <SummaryCard
-                title="Net Profit"
-                value={formatCurrency(calculations.netProfit)}
+                title={`${getTimePeriodLabel()} Net Profit`}
+                value={formatCurrency(convertToTimePeriod(calculations.netProfit))}
                 trend={calculations.netProfit > 0 ? "up" : "down"}
               />
               <SummaryCard
@@ -401,13 +439,13 @@ export default function ProfitEstimatorPage() {
 
             {/* Profit Breakdown Chart */}
             <ProfitChart
-              title="Profit Breakdown"
+              title={`${getTimePeriodLabel()} Profit Breakdown`}
               data={[
-                { label: "Revenue", value: calculations.totalRevenue, color: "#6B2D5C" },
-                { label: "Direct Costs", value: calculations.totalDirectCosts, color: "#D4A574" },
-                { label: "Labor Costs", value: calculations.totalLaborCosts, color: "#2D2D2D" },
-                { label: "Overhead", value: calculations.totalOverhead, color: "#8B4F7D" },
-                { label: "Taxes", value: calculations.totalTaxes, color: "#A67C52" },
+                { label: "Revenue", value: convertToTimePeriod(calculations.totalRevenue), color: "#6B2D5C" },
+                { label: "Direct Costs", value: convertToTimePeriod(calculations.totalDirectCosts), color: "#D4A574" },
+                { label: "Labor Costs", value: convertToTimePeriod(calculations.totalLaborCosts), color: "#2D2D2D" },
+                { label: "Overhead", value: convertToTimePeriod(calculations.totalOverhead), color: "#8B4F7D" },
+                { label: "Taxes", value: convertToTimePeriod(calculations.totalTaxes), color: "#A67C52" },
               ]}
             />
 
@@ -423,18 +461,18 @@ export default function ProfitEstimatorPage() {
               </div>
               <div className="bg-white border-2 border-brand-plum p-6">
                 <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
-                  Monthly Overhead
+                  {getTimePeriodLabel()} Overhead
                 </div>
                 <div className="text-4xl font-display font-bold text-brand-plum">
-                  {formatCurrency(calculations.totalOverhead)}
+                  {formatCurrency(convertToTimePeriod(calculations.totalOverhead))}
                 </div>
               </div>
               <div className="bg-white border-2 border-brand-plum p-6">
                 <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
-                  After-Tax Profit
+                  {getTimePeriodLabel()} After-Tax Profit
                 </div>
                 <div className="text-4xl font-display font-bold text-brand-gold">
-                  {formatCurrency(calculations.profitAfterTax)}
+                  {formatCurrency(convertToTimePeriod(calculations.profitAfterTax))}
                 </div>
               </div>
             </div>
