@@ -351,7 +351,29 @@ export default function ProfitEstimatorPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Dashboard Tab */}
-        {activeTab === "dashboard" && calculations && (
+        {activeTab === "dashboard" && (
+          <>
+            {!calculations ? (
+              <div className="bg-white border-2 border-brand-plum p-12 text-center">
+                <p className="text-brand-charcoal/60 font-mono uppercase tracking-widest mb-4">
+                  No data available yet. Add projects, overhead expenses, and labor rates to see your profit calculations.
+                </p>
+                <div className="flex gap-4 justify-center">
+                  <button
+                    onClick={() => setActiveTab("projects")}
+                    className="px-6 py-3 bg-brand-plum text-brand-bone font-bold uppercase tracking-widest hover:bg-brand-plum/90 transition-all"
+                  >
+                    Add Project
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("overhead")}
+                    className="px-6 py-3 border-2 border-brand-plum text-brand-plum font-bold uppercase tracking-widest hover:bg-brand-plum hover:text-brand-bone transition-all"
+                  >
+                    Add Overhead
+                  </button>
+                </div>
+              </div>
+            ) : (
           <div className="space-y-8">
             {/* Summary Cards */}
             <div className="grid md:grid-cols-4 gap-6">
@@ -417,6 +439,8 @@ export default function ProfitEstimatorPage() {
               </div>
             </div>
           </div>
+            )}
+          </>
         )}
 
         {/* Projects Tab */}
@@ -634,7 +658,15 @@ export default function ProfitEstimatorPage() {
         )}
 
         {/* Tax Settings Tab */}
-        {activeTab === "tax" && taxSettings && (
+        {activeTab === "tax" && (
+          <>
+            {!taxSettings ? (
+              <div className="bg-white border-2 border-brand-plum p-12 text-center">
+                <p className="text-brand-charcoal/60 font-mono uppercase tracking-widest">
+                  Loading tax settings...
+                </p>
+              </div>
+            ) : (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-display font-bold text-brand-plum uppercase">
@@ -705,6 +737,8 @@ export default function ProfitEstimatorPage() {
               </p>
             </div>
           </div>
+            )}
+          </>
         )}
       </div>
 
