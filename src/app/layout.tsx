@@ -3,6 +3,7 @@ import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import clsx from "clsx";
 import SessionProvider from "@/components/providers/SessionProvider";
+import ToastProvider from "@/components/providers/ToastProvider";
 
 // Fonts
 const spaceGrotesk = Space_Grotesk({
@@ -72,7 +73,10 @@ export default function RootLayout({
           "antialiased bg-brand-bone text-brand-charcoal font-sans"
         )}
       >
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <ToastProvider />
+          {children}
+        </SessionProvider>
       </body>
     </html>
   );

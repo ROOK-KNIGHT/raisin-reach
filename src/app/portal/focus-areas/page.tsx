@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import AddFocusAreaModal from "@/components/portal/AddFocusAreaModal";
 
 interface FocusArea {
   id: string;
@@ -24,6 +25,7 @@ export default function FocusAreasPage() {
 
   const [focusAreas, setFocusAreas] = useState<FocusArea[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch focus areas from API
   useEffect(() => {
@@ -132,7 +134,10 @@ export default function FocusAreasPage() {
             <h2 className="text-4xl font-display font-bold text-brand-plum uppercase mb-2">Focus Areas</h2>
             <p className="text-brand-charcoal/60">Define your ideal customer profiles and targeting criteria</p>
           </div>
-          <button className="px-6 py-3 bg-brand-gold text-brand-plum font-mono text-sm uppercase tracking-widest font-bold hover:bg-brand-plum hover:text-brand-gold border-2 border-brand-plum transition-all">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="px-6 py-3 bg-brand-gold text-brand-plum font-mono text-sm uppercase tracking-widest font-bold hover:bg-brand-plum hover:text-brand-gold border-2 border-brand-plum transition-all"
+          >
             + Add New Focus Area
           </button>
         </div>
@@ -269,6 +274,13 @@ export default function FocusAreasPage() {
           </ul>
         </div>
       </div>
+
+      {/* Add Focus Area Modal */}
+      <AddFocusAreaModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={fetchFocusAreas}
+      />
     </main>
   );
 }
