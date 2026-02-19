@@ -44,14 +44,14 @@ export default function PortalDashboard() {
   const [hotLeads, setHotLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch dashboard data
+  // Redirect to sign-in if not authenticated
   useEffect(() => {
-    if (status === "authenticated") {
+    if (status === "unauthenticated") {
+      router.push("/auth/signin");
+    } else if (status === "authenticated") {
       fetchDashboardData();
-    } else if (status === "unauthenticated") {
-      setLoading(false);
     }
-  }, [status]);
+  }, [status, router]);
 
   const fetchDashboardData = async () => {
     try {
