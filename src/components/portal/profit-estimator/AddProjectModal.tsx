@@ -14,16 +14,12 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }: AddProje
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    status: "PLANNED" as "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED",
+    status: "ACTIVE" as "ACTIVE" | "COMPLETED" | "ON_HOLD",
     startDate: "",
     endDate: "",
-    projectedRevenue: "",
-    actualRevenue: "",
-    laborCost: "",
-    materialCost: "",
-    otherCosts: "",
+    revenue: "",
+    directCosts: "",
     laborHours: "",
-    numberOfWorkers: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,13 +30,8 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }: AddProje
       return;
     }
 
-    if (!formData.startDate || !formData.endDate) {
-      toast.error("Please enter start and end dates");
-      return;
-    }
-
-    if (!formData.projectedRevenue || parseFloat(formData.projectedRevenue) < 0) {
-      toast.error("Please enter a valid projected revenue");
+    if (!formData.startDate) {
+      toast.error("Please enter a start date");
       return;
     }
 
@@ -61,16 +52,12 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }: AddProje
         setFormData({
           name: "",
           description: "",
-          status: "PLANNED",
+          status: "ACTIVE",
           startDate: "",
           endDate: "",
-          projectedRevenue: "",
-          actualRevenue: "",
-          laborCost: "",
-          materialCost: "",
-          otherCosts: "",
+          revenue: "",
+          directCosts: "",
           laborHours: "",
-          numberOfWorkers: "",
         });
         onSuccess();
         onClose();
@@ -90,16 +77,12 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }: AddProje
       setFormData({
         name: "",
         description: "",
-        status: "PLANNED",
+        status: "ACTIVE",
         startDate: "",
         endDate: "",
-        projectedRevenue: "",
-        actualRevenue: "",
-        laborCost: "",
-        materialCost: "",
-        otherCosts: "",
+        revenue: "",
+        directCosts: "",
         laborHours: "",
-        numberOfWorkers: "",
       });
       onClose();
     }
@@ -159,10 +142,9 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }: AddProje
                 className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
                 required
               >
-                <option value="PLANNED">Planned</option>
-                <option value="IN_PROGRESS">In Progress</option>
+                <option value="ACTIVE">Active</option>
                 <option value="COMPLETED">Completed</option>
-                <option value="CANCELLED">Cancelled</option>
+                <option value="ON_HOLD">On Hold</option>
               </select>
             </div>
 
@@ -181,63 +163,22 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }: AddProje
 
             <div>
               <label className="block text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
-                End Date <span className="text-red-500">*</span>
+                End Date
               </label>
               <input
                 type="date"
                 value={formData.endDate}
                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                 className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
-                required
               />
             </div>
           </div>
 
-          {/* Revenue */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
-                Projected Revenue <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-charcoal/60 font-bold">$</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.projectedRevenue}
-                  onChange={(e) => setFormData({ ...formData, projectedRevenue: e.target.value })}
-                  placeholder="0.00"
-                  className="w-full pl-8 pr-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
-                Actual Revenue
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-charcoal/60 font-bold">$</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.actualRevenue}
-                  onChange={(e) => setFormData({ ...formData, actualRevenue: e.target.value })}
-                  placeholder="0.00"
-                  className="w-full pl-8 pr-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Costs */}
+          {/* Revenue & Costs */}
           <div className="grid md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
-                Labor Cost
+                Revenue
               </label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-charcoal/60 font-bold">$</span>
@@ -245,8 +186,8 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }: AddProje
                   type="number"
                   step="0.01"
                   min="0"
-                  value={formData.laborCost}
-                  onChange={(e) => setFormData({ ...formData, laborCost: e.target.value })}
+                  value={formData.revenue}
+                  onChange={(e) => setFormData({ ...formData, revenue: e.target.value })}
                   placeholder="0.00"
                   className="w-full pl-8 pr-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
                 />
@@ -255,7 +196,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }: AddProje
 
             <div>
               <label className="block text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
-                Material Cost
+                Direct Costs
               </label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-charcoal/60 font-bold">$</span>
@@ -263,35 +204,14 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }: AddProje
                   type="number"
                   step="0.01"
                   min="0"
-                  value={formData.materialCost}
-                  onChange={(e) => setFormData({ ...formData, materialCost: e.target.value })}
+                  value={formData.directCosts}
+                  onChange={(e) => setFormData({ ...formData, directCosts: e.target.value })}
                   placeholder="0.00"
                   className="w-full pl-8 pr-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
-                Other Costs
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-charcoal/60 font-bold">$</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.otherCosts}
-                  onChange={(e) => setFormData({ ...formData, otherCosts: e.target.value })}
-                  placeholder="0.00"
-                  className="w-full pl-8 pr-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Labor Details */}
-          <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
                 Labor Hours
@@ -302,20 +222,6 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }: AddProje
                 min="0"
                 value={formData.laborHours}
                 onChange={(e) => setFormData({ ...formData, laborHours: e.target.value })}
-                placeholder="0"
-                className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
-                Number of Workers
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={formData.numberOfWorkers}
-                onChange={(e) => setFormData({ ...formData, numberOfWorkers: e.target.value })}
                 placeholder="0"
                 className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
               />
