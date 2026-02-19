@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
       orderBy: { startDate: "desc" },
     });
 
-    return NextResponse.json({ projects }, { status: 200 });
+    return NextResponse.json(projects, { status: 200 });
   } catch (error) {
     console.error("Error fetching projects:", error);
     return NextResponse.json(
@@ -59,26 +59,15 @@ export async function POST(req: NextRequest) {
       status,
       startDate,
       endDate,
-      projectedRevenue,
-      actualRevenue,
-      laborCost,
-      materialCost,
-      otherCosts,
+      revenue,
+      directCosts,
       laborHours,
-      numberOfWorkers,
     } = body;
 
     // Validation
-    if (!name || !startDate || !endDate || projectedRevenue === undefined) {
+    if (!name || !startDate) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
-
-    if (projectedRevenue < 0) {
-      return NextResponse.json(
-        { error: "Projected revenue must be positive" },
         { status: 400 }
       );
     }
@@ -88,20 +77,16 @@ export async function POST(req: NextRequest) {
         userId: user.id,
         name,
         description: description || null,
-        status: status || "PLANNED",
+        status: status || "ACTIVE",
         startDate: new Date(startDate),
-        endDate: new Date(endDate),
-        projectedRevenue: parseFloat(projectedRevenue),
-        actualRevenue: actualRevenue ? parseFloat(actualRevenue) : null,
-        laborCost: laborCost ? parseFloat(laborCost) : 0,
-        materialCost: materialCost ? parseFloat(materialCost) : 0,
-        otherCosts: otherCosts ? parseFloat(otherCosts) : 0,
-        laborHours: laborHours ? parseFloat(laborHours) : null,
-        numberOfWorkers: numberOfWorkers ? parseInt(numberOfWorkers) : null,
+        endDate: endDate ? new Date(endDate) : null,
+        revenue: revenue ? parseFloat(revenue) : 0,
+        directCosts: directCosts ? parseFloat(directCosts) : 0,
+        laborHours: laborHours ? parseFloat(laborHours) : 0,
       },
     });
 
-    return NextResponse.json({ project }, { status: 201 });
+    return NextResponse.json(project, { status: 201 });
   } catch (error) {
     console.error("Error creating project:", error);
     return NextResponse.json(
@@ -136,13 +121,9 @@ export async function PUT(req: NextRequest) {
       status,
       startDate,
       endDate,
-      projectedRevenue,
-      actualRevenue,
-      laborCost,
-      materialCost,
-      otherCosts,
+      revenue,
+      directCosts,
       laborHours,
-      numberOfWorkers,
     } = body;
 
     if (!id) {
@@ -172,28 +153,14 @@ export async function PUT(req: NextRequest) {
         ...(description !== undefined && { description }),
         ...(status && { status }),
         ...(startDate && { startDate: new Date(startDate) }),
-        ...(endDate && { endDate: new Date(endDate) }),
-        ...(projectedRevenue !== undefined && {
-          projectedRevenue: parseFloat(projectedRevenue),
-        }),
-        ...(actualRevenue !== undefined && {
-          actualRevenue: actualRevenue ? parseFloat(actualRevenue) : null,
-        }),
-        ...(laborCost !== undefined && { laborCost: parseFloat(laborCost) }),
-        ...(materialCost !== undefined && {
-          materialCost: parseFloat(materialCost),
-        }),
-        ...(otherCosts !== undefined && { otherCosts: parseFloat(otherCosts) }),
-        ...(laborHours !== undefined && {
-          laborHours: laborHours ? parseFloat(laborHours) : null,
-        }),
-        ...(numberOfWorkers !== undefined && {
-          numberOfWorkers: numberOfWorkers ? parseInt(numberOfWorkers) : null,
-        }),
+        ...(endDate !== undefined && { endDate: endDate ? new Date(endDate) : null }),
+        ...(revenue !== undefined && { revenue: parseFloat(revenue) }),
+        ...(directCosts !== undefined && { directCosts: parseFloat(directCosts) }),
+        ...(laborHours !== undefined && { laborHours: parseFloat(laborHours) }),
       },
     });
 
-    return NextResponse.json({ project }, { status: 200 });
+    return NextResponse.json(project, { status: 200 });
   } catch (error) {
     console.error("Error updating project:", error);
     return NextResponse.json(

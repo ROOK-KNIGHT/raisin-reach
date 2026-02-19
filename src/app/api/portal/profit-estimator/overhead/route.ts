@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ expenses }, { status: 200 });
+    return NextResponse.json(expenses, { status: 200 });
   } catch (error) {
     console.error("Error fetching overhead expenses:", error);
     return NextResponse.json(
@@ -53,10 +53,10 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, category, amount, frequency, isActive } = body;
+    const { category, description, amount, frequency } = body;
 
     // Validation
-    if (!name || !category || amount === undefined || !frequency) {
+    if (!category || !description || amount === undefined || !frequency) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -73,15 +73,14 @@ export async function POST(req: NextRequest) {
     const expense = await prisma.overheadExpense.create({
       data: {
         userId: user.id,
-        name,
         category,
+        description,
         amount: parseFloat(amount),
         frequency,
-        isActive: isActive !== undefined ? isActive : true,
       },
     });
 
-    return NextResponse.json({ expense }, { status: 201 });
+    return NextResponse.json(expense, { status: 201 });
   } catch (error) {
     console.error("Error creating overhead expense:", error);
     return NextResponse.json(
@@ -109,7 +108,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { id, name, category, amount, frequency, isActive } = body;
+    const { id, category, description, amount, frequency } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -134,15 +133,14 @@ export async function PUT(req: NextRequest) {
     const expense = await prisma.overheadExpense.update({
       where: { id },
       data: {
-        ...(name && { name }),
         ...(category && { category }),
+        ...(description && { description }),
         ...(amount !== undefined && { amount: parseFloat(amount) }),
         ...(frequency && { frequency }),
-        ...(isActive !== undefined && { isActive }),
       },
     });
 
-    return NextResponse.json({ expense }, { status: 200 });
+    return NextResponse.json(expense, { status: 200 });
   } catch (error) {
     console.error("Error updating overhead expense:", error);
     return NextResponse.json(
