@@ -8,8 +8,7 @@ import { useState, useEffect } from "react";
 export default function SettingsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const user = session?.user as any || { name: "Demo User", email: "demo@example.com" };
-
+  
   const [activeTab, setActiveTab] = useState("profile");
   const [loading, setLoading] = useState(true);
 
@@ -22,9 +21,17 @@ export default function SettingsPage() {
     timezone: "America/New_York",
   });
 
+  const [notificationSettings, setNotificationSettings] = useState({
+    emailOnNewLead: true,
+    emailOnCallComplete: false,
+    emailWeeklySummary: true,
+    smsOnHotLead: false,
+  });
+
   // Load user data from session
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
+      const user = session.user as any;
       setProfileData({
         name: user.name || "",
         email: user.email || "",
@@ -36,7 +43,7 @@ export default function SettingsPage() {
     } else if (status === "unauthenticated") {
       router.push("/auth/signin");
     }
-  }, [status, session, router, user]);
+  }, [status, session, router]);
 
   if (status === "loading" || loading) {
     return (
@@ -49,12 +56,7 @@ export default function SettingsPage() {
     );
   }
 
-  const [notificationSettings, setNotificationSettings] = useState({
-    emailOnNewLead: true,
-    emailOnCallComplete: false,
-    emailWeeklySummary: true,
-    smsOnHotLead: false,
-  });
+  const user = session?.user as any || { name: "Demo User", email: "demo@example.com" };
 
   // Billing info - in a real app, this would come from a subscription service
   const billingInfo = {
