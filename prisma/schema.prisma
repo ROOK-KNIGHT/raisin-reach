@@ -65,6 +65,10 @@ model User {
   leads             Lead[]
   focusAreas        FocusArea[]
   notificationPreferences NotificationPreferences?
+  overheadExpenses  OverheadExpense[]
+  projects          Project[]
+  laborRates        LaborRate[]
+  taxSettings       TaxSettings?
   
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
@@ -217,4 +221,109 @@ model NotificationPreferences {
   updatedAt             DateTime @updatedAt
 
   @@index([userId])
+}
+
+// Profit Estimator Models
+model OverheadExpense {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name        String
+  category    ExpenseCategory
+  amount      Float
+  frequency   Frequency @default(MONTHLY)
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([isActive])
+}
+
+model Project {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name            String
+  description     String?  @db.Text
+  status          ProjectStatus @default(PLANNED)
+  
+  startDate       DateTime
+  endDate         DateTime
+  
+  projectedRevenue Float
+  actualRevenue    Float?
+  
+  laborCost       Float    @default(0)
+  materialCost    Float    @default(0)
+  otherCosts      Float    @default(0)
+  
+  laborHours      Float?
+  numberOfWorkers Int?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([startDate])
+}
+
+model LaborRate {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  roleName    String
+  hourlyRate  Float
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model TaxSettings {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  federalTaxRate    Float    @default(22.0)  // percentage
+  stateTaxRate      Float    @default(0.0)   // percentage
+  selfEmploymentTax Float    @default(15.3)  // percentage
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([userId])
+}
+
+enum ExpenseCategory {
+  RENT
+  UTILITIES
+  INSURANCE
+  MARKETING
+  SUPPLIES
+  SOFTWARE
+  EQUIPMENT
+  OTHER
+}
+
+enum Frequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  ANNUALLY
+}
+
+enum ProjectStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
 }
