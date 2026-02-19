@@ -60,20 +60,6 @@ export default function ProfitChart({ data, title }: ProfitChartProps) {
           );
         })}
       </div>
-
-      <div className="mt-6 pt-6 border-t-2 border-brand-plum/20">
-        <div className="flex items-center justify-between">
-          <span className="font-mono text-sm uppercase tracking-widest text-brand-charcoal/60">
-            Total
-          </span>
-          <span className="text-2xl font-display font-bold text-brand-plum">
-            ${total.toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </span>
-        </div>
-      </div>
     </div>
   );
 }
