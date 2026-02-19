@@ -229,17 +229,15 @@ model OverheadExpense {
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  name        String
-  category    ExpenseCategory
+  category    String
+  description String
   amount      Float
   frequency   Frequency @default(MONTHLY)
-  isActive    Boolean  @default(true)
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([userId])
-  @@index([isActive])
 }
 
 model Project {
@@ -249,20 +247,14 @@ model Project {
   
   name            String
   description     String?  @db.Text
-  status          ProjectStatus @default(PLANNED)
+  status          ProjectStatus @default(ACTIVE)
   
   startDate       DateTime
-  endDate         DateTime
+  endDate         DateTime?
   
-  projectedRevenue Float
-  actualRevenue    Float?
-  
-  laborCost       Float    @default(0)
-  materialCost    Float    @default(0)
-  otherCosts      Float    @default(0)
-  
-  laborHours      Float?
-  numberOfWorkers Int?
+  revenue         Float    @default(0)
+  directCosts     Float    @default(0)
+  laborHours      Float    @default(0)
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -277,9 +269,8 @@ model LaborRate {
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  roleName    String
+  role        String
   hourlyRate  Float
-  isActive    Boolean  @default(true)
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -294,7 +285,7 @@ model TaxSettings {
   
   federalTaxRate    Float    @default(22.0)  // percentage
   stateTaxRate      Float    @default(0.0)   // percentage
-  selfEmploymentTax Float    @default(15.3)  // percentage
+  localTaxRate      Float    @default(0.0)   // percentage
   
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -313,17 +304,16 @@ enum ExpenseCategory {
   OTHER
 }
 
+
+enum ProjectStatus {
+  ACTIVE
+  COMPLETED
+  ON_HOLD
+}
+
 enum Frequency {
-  DAILY
   WEEKLY
   MONTHLY
   QUARTERLY
-  ANNUALLY
-}
-
-enum ProjectStatus {
-  PLANNED
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
+  YEARLY
 }
