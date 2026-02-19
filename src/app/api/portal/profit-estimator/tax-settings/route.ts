@@ -28,13 +28,13 @@ export async function GET(req: NextRequest) {
           userId: user.id,
           federalTaxRate: 22.0,
           stateTaxRate: 0.0,
-          selfEmploymentTax: 15.3,
+          localTaxRate: 0.0,
         },
       });
-      return NextResponse.json({ taxSettings }, { status: 200 });
+      return NextResponse.json(taxSettings, { status: 200 });
     }
 
-    return NextResponse.json({ taxSettings: user.taxSettings }, { status: 200 });
+    return NextResponse.json(user.taxSettings, { status: 200 });
   } catch (error) {
     console.error("Error fetching tax settings:", error);
     return NextResponse.json(
@@ -63,7 +63,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { federalTaxRate, stateTaxRate, selfEmploymentTax } = body;
+    const { federalTaxRate, stateTaxRate, localTaxRate } = body;
 
     // Validation
     if (
@@ -84,11 +84,11 @@ export async function PUT(req: NextRequest) {
     }
 
     if (
-      selfEmploymentTax !== undefined &&
-      (selfEmploymentTax < 0 || selfEmploymentTax > 100)
+      localTaxRate !== undefined &&
+      (localTaxRate < 0 || localTaxRate > 100)
     ) {
       return NextResponse.json(
-        { error: "Self-employment tax must be between 0 and 100" },
+        { error: "Local tax rate must be between 0 and 100" },
         { status: 400 }
       );
     }
@@ -102,7 +102,7 @@ export async function PUT(req: NextRequest) {
           userId: user.id,
           federalTaxRate: federalTaxRate !== undefined ? parseFloat(federalTaxRate) : 22.0,
           stateTaxRate: stateTaxRate !== undefined ? parseFloat(stateTaxRate) : 0.0,
-          selfEmploymentTax: selfEmploymentTax !== undefined ? parseFloat(selfEmploymentTax) : 15.3,
+          localTaxRate: localTaxRate !== undefined ? parseFloat(localTaxRate) : 0.0,
         },
       });
     } else {
@@ -116,14 +116,14 @@ export async function PUT(req: NextRequest) {
           ...(stateTaxRate !== undefined && {
             stateTaxRate: parseFloat(stateTaxRate),
           }),
-          ...(selfEmploymentTax !== undefined && {
-            selfEmploymentTax: parseFloat(selfEmploymentTax),
+          ...(localTaxRate !== undefined && {
+            localTaxRate: parseFloat(localTaxRate),
           }),
         },
       });
     }
 
-    return NextResponse.json({ taxSettings }, { status: 200 });
+    return NextResponse.json(taxSettings, { status: 200 });
   } catch (error) {
     console.error("Error updating tax settings:", error);
     return NextResponse.json(

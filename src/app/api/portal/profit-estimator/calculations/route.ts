@@ -1,20 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import {
-  calculateGrossProfit,
-  calculateNetProfit,
-  calculateTaxLiability,
-  calculateProfitMargin,
-  calculateBreakEven,
-  calculateQuarterlyTaxEstimate,
-  annualizeAmount,
-  calculateTotalDirectCosts,
-} from "@/lib/profitCalculations";
-import type { Frequency } from "@/lib/profitCalculations";
+import { prisma } from "@/lib/prisma";
 
-// POST - Calculate profit metrics
-export async function POST(req: NextRequest) {
+// GET - Calculate profit metrics from database
+export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -22,94 +12,75 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
-    const {
-      revenue,
-      laborCost,
-      materialCost,
-      otherCosts,
-      overheadExpenses, // Array of { amount, frequency }
-      federalTaxRate,
-      stateTaxRate,
-      selfEmploymentTax,
-    } = body;
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      include: {
+        projects: true,
+        overheadExpenses: true,
+        laborRates: true,
+        taxSettings: true,
+      },
+    });
 
-    // Validation
-    if (revenue === undefined) {
-      return NextResponse.json(
-        { error: "Revenue is required" },
-        { status: 400 }
-      );
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Calculate total direct costs
-    const totalDirectCosts = calculateTotalDirectCosts(
-      laborCost || 0,
-      materialCost || 0,
-      otherCosts || 0
-    );
+    // Calculate total revenue from all projects
+    const totalRevenue = user.projects.reduce((sum: number, project: any) => sum + project.revenue, 0);
+
+    // Calculate total direct costs from all projects
+    const totalDirectCosts = user.projects.reduce((sum: number, project: any) => sum + project.directCosts, 0);
+
+    // Calculate total labor costs
+    const totalLaborHours = user.projects.reduce((sum: number, project: any) => sum + project.laborHours, 0);
+    const averageLaborRate = user.laborRates.length > 0
+      ? user.laborRates.reduce((sum: number, rate: any) => sum + rate.hourlyRate, 0) / user.laborRates.length
+      : 0;
+    const totalLaborCosts = totalLaborHours * averageLaborRate;
+
+    // Calculate total overhead (annualized)
+    const totalOverhead = user.overheadExpenses.reduce((sum: number, expense: any) => {
+      let multiplier = 12; // Default to monthly
+      if (expense.frequency === "WEEKLY") multiplier = 52;
+      else if (expense.frequency === "QUARTERLY") multiplier = 4;
+      else if (expense.frequency === "YEARLY") multiplier = 1;
+      return sum + (expense.amount * multiplier);
+    }, 0);
 
     // Calculate gross profit
-    const grossProfit = calculateGrossProfit(revenue, totalDirectCosts);
+    const grossProfit = totalRevenue - totalDirectCosts - totalLaborCosts;
 
-    // Calculate total annual overhead
-    let totalAnnualOverhead = 0;
-    if (overheadExpenses && Array.isArray(overheadExpenses)) {
-      totalAnnualOverhead = overheadExpenses.reduce((sum, expense) => {
-        const annualized = annualizeAmount(
-          expense.amount,
-          expense.frequency as Frequency
-        );
-        return sum + annualized;
-      }, 0);
-    }
+    // Calculate net profit (before tax)
+    const netProfit = grossProfit - totalOverhead;
 
-    // Calculate tax liability
-    const taxableIncome = grossProfit - totalAnnualOverhead;
-    const taxLiability = calculateTaxLiability(
-      taxableIncome,
-      federalTaxRate || 22.0,
-      stateTaxRate || 0.0,
-      selfEmploymentTax || 15.3
-    );
+    // Calculate profit margin
+    const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
 
-    // Calculate net profit
-    const netProfit = calculateNetProfit(
-      grossProfit,
-      totalAnnualOverhead,
-      taxLiability
-    );
+    // Calculate taxes
+    const taxSettings = user.taxSettings || {
+      federalTaxRate: 22.0,
+      stateTaxRate: 0.0,
+      localTaxRate: 0.0,
+    };
 
-    // Calculate profit margins
-    const grossProfitMargin = calculateProfitMargin(grossProfit, revenue);
-    const netProfitMargin = calculateProfitMargin(netProfit, revenue);
+    const totalTaxRate = (taxSettings.federalTaxRate + taxSettings.stateTaxRate + taxSettings.localTaxRate) / 100;
+    const totalTaxes = netProfit > 0 ? netProfit * totalTaxRate : 0;
 
-    // Calculate quarterly tax estimate
-    const quarterlyTaxEstimate = calculateQuarterlyTaxEstimate(
-      taxableIncome,
-      federalTaxRate || 22.0,
-      stateTaxRate || 0.0,
-      selfEmploymentTax || 15.3
-    );
-
-    // Calculate break-even (simplified)
-    const breakEvenRevenue = totalAnnualOverhead + totalDirectCosts;
+    // Calculate profit after tax
+    const profitAfterTax = netProfit - totalTaxes;
 
     return NextResponse.json(
       {
-        calculations: {
-          revenue,
-          totalDirectCosts,
-          grossProfit,
-          totalAnnualOverhead,
-          taxableIncome,
-          taxLiability,
-          netProfit,
-          grossProfitMargin,
-          netProfitMargin,
-          quarterlyTaxEstimate,
-          breakEvenRevenue,
-        },
+        totalRevenue,
+        totalDirectCosts,
+        totalLaborCosts,
+        totalOverhead,
+        grossProfit,
+        netProfit,
+        profitMargin,
+        totalTaxes,
+        profitAfterTax,
       },
       { status: 200 }
     );
