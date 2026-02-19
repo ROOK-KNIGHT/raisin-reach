@@ -12,14 +12,14 @@ interface AddLaborRateModalProps {
 export default function AddLaborRateModal({ isOpen, onClose, onSuccess }: AddLaborRateModalProps) {
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    roleName: "",
+    role: "",
     hourlyRate: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.roleName.trim()) {
+    if (!formData.role.trim()) {
       toast.error("Please enter a role name");
       return;
     }
@@ -44,7 +44,7 @@ export default function AddLaborRateModal({ isOpen, onClose, onSuccess }: AddLab
       if (response.ok) {
         toast.success("Labor rate added successfully!");
         setFormData({
-          roleName: "",
+          role: "",
           hourlyRate: "",
         });
         onSuccess();
@@ -63,7 +63,7 @@ export default function AddLaborRateModal({ isOpen, onClose, onSuccess }: AddLab
   const handleClose = () => {
     if (!saving) {
       setFormData({
-        roleName: "",
+        role: "",
         hourlyRate: "",
       });
       onClose();
@@ -90,8 +90,8 @@ export default function AddLaborRateModal({ isOpen, onClose, onSuccess }: AddLab
             </label>
             <input
               type="text"
-              value={formData.roleName}
-              onChange={(e) => setFormData({ ...formData, roleName: e.target.value })}
+              value={formData.role}
+              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               placeholder="e.g., Project Manager, Developer, Designer"
               className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
               required

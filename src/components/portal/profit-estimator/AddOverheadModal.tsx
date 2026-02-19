@@ -12,17 +12,22 @@ interface AddOverheadModalProps {
 export default function AddOverheadModal({ isOpen, onClose, onSuccess }: AddOverheadModalProps) {
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    category: "OTHER" as "RENT" | "UTILITIES" | "INSURANCE" | "MARKETING" | "SUPPLIES" | "SOFTWARE" | "EQUIPMENT" | "OTHER",
+    category: "",
+    description: "",
     amount: "",
-    frequency: "MONTHLY" as "DAILY" | "WEEKLY" | "MONTHLY" | "QUARTERLY" | "ANNUALLY",
+    frequency: "MONTHLY" as "WEEKLY" | "MONTHLY" | "QUARTERLY" | "YEARLY",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name.trim()) {
-      toast.error("Please enter an expense name");
+    if (!formData.category.trim()) {
+      toast.error("Please enter a category");
+      return;
+    }
+
+    if (!formData.description.trim()) {
+      toast.error("Please enter a description");
       return;
     }
 
@@ -46,8 +51,8 @@ export default function AddOverheadModal({ isOpen, onClose, onSuccess }: AddOver
       if (response.ok) {
         toast.success("Overhead expense added successfully!");
         setFormData({
-          name: "",
-          category: "OTHER",
+          category: "",
+          description: "",
           amount: "",
           frequency: "MONTHLY",
         });
@@ -67,8 +72,8 @@ export default function AddOverheadModal({ isOpen, onClose, onSuccess }: AddOver
   const handleClose = () => {
     if (!saving) {
       setFormData({
-        name: "",
-        category: "OTHER",
+        category: "",
+        description: "",
         amount: "",
         frequency: "MONTHLY",
       });
@@ -89,41 +94,34 @@ export default function AddOverheadModal({ isOpen, onClose, onSuccess }: AddOver
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Name */}
-          <div>
-            <label className="block text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
-              Expense Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="e.g., Office Rent, Internet Service"
-              className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
-              required
-            />
-          </div>
-
           {/* Category */}
           <div>
             <label className="block text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
               Category <span className="text-red-500">*</span>
             </label>
-            <select
+            <input
+              type="text"
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              placeholder="e.g., Rent, Utilities, Insurance, Marketing"
               className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
               required
-            >
-              <option value="RENT">Rent</option>
-              <option value="UTILITIES">Utilities</option>
-              <option value="INSURANCE">Insurance</option>
-              <option value="MARKETING">Marketing</option>
-              <option value="SUPPLIES">Supplies</option>
-              <option value="SOFTWARE">Software</option>
-              <option value="EQUIPMENT">Equipment</option>
-              <option value="OTHER">Other</option>
-            </select>
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
+              Description <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="e.g., Office Rent, Internet Service"
+              className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
+              required
+            />
           </div>
 
           {/* Amount & Frequency */}
@@ -159,11 +157,10 @@ export default function AddOverheadModal({ isOpen, onClose, onSuccess }: AddOver
                 className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
                 required
               >
-                <option value="DAILY">Daily</option>
                 <option value="WEEKLY">Weekly</option>
                 <option value="MONTHLY">Monthly</option>
                 <option value="QUARTERLY">Quarterly</option>
-                <option value="ANNUALLY">Annually</option>
+                <option value="YEARLY">Yearly</option>
               </select>
             </div>
           </div>
