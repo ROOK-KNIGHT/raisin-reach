@@ -196,6 +196,7 @@ export default function SignUp() {
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
                 minLength={8}
+                autoComplete="new-password"
                 className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
                 placeholder="••••••••"
               />
@@ -212,6 +213,7 @@ export default function SignUp() {
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 required
+                autoComplete="new-password"
                 className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
                 placeholder="••••••••"
               />

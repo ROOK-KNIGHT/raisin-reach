@@ -129,6 +129,7 @@ export default function SignIn() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                autoComplete="current-password"
                 className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
                 placeholder="••••••••"
               />
@@ -145,12 +146,6 @@ export default function SignIn() {
 
           {/* Links */}
           <div className="mt-6 text-center space-y-2">
-            <Link
-              href="/auth/forgot-password"
-              className="block text-sm text-brand-plum hover:text-brand-gold transition-colors"
-            >
-              Forgot password?
-            </Link>
             <p className="text-sm text-brand-charcoal/60">
               Don't have an account?{" "}
               <Link href="/auth/signup" className="text-brand-plum font-bold hover:text-brand-gold transition-colors">

@@ -1,63 +1,64 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+interface FocusArea {
+  id: string;
+  name: string;
+  description: string | null;
+  targetIndustries: string[];
+  targetTitles: string[];
+  companySize: string | null;
+  geography: string | null;
+  isActive: boolean;
+  createdAt: string;
+}
 
 export default function FocusAreasPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const user = session?.user as any || { name: "Demo User" };
 
-  const [isEditing, setIsEditing] = useState(false);
+  const [focusAreas, setFocusAreas] = useState<FocusArea[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock focus areas data
-  const [focusAreas, setFocusAreas] = useState([
-    {
-      id: 1,
-      name: "Enterprise Manufacturing",
-      description: "Large-scale manufacturing companies with 500+ employees",
-      criteria: {
-        industries: ["Manufacturing", "Industrial Equipment", "Automotive"],
-        companySize: "500-5000 employees",
-        revenue: "$50M - $500M",
-        geography: "North America",
-        titles: ["VP of Operations", "Director of Manufacturing", "Plant Manager"],
-      },
-      status: "active",
-      callsThisMonth: 42,
-      leadsGenerated: 8,
-    },
-    {
-      id: 2,
-      name: "Tech Startups (Series A+)",
-      description: "Fast-growing technology companies with funding",
-      criteria: {
-        industries: ["SaaS", "Software Development", "Cloud Services"],
-        companySize: "50-500 employees",
-        revenue: "$5M - $50M",
-        geography: "US & Canada",
-        titles: ["CTO", "VP of Engineering", "Head of Product"],
-      },
-      status: "active",
-      callsThisMonth: 28,
-      leadsGenerated: 5,
-    },
-    {
-      id: 3,
-      name: "Healthcare Providers",
-      description: "Mid-size healthcare organizations and hospital systems",
-      criteria: {
-        industries: ["Healthcare", "Medical Devices", "Hospital Systems"],
-        companySize: "200-2000 employees",
-        revenue: "$20M - $200M",
-        geography: "United States",
-        titles: ["Chief Medical Officer", "VP of Operations", "Director of IT"],
-      },
-      status: "paused",
-      callsThisMonth: 0,
-      leadsGenerated: 0,
-    },
-  ]);
+  // Fetch focus areas from API
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetchFocusAreas();
+    } else if (status === "unauthenticated") {
+      router.push("/auth/signin");
+    }
+  }, [status, router]);
+
+  const fetchFocusAreas = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/portal/focus-areas');
+      if (res.ok) {
+        const data = await res.json();
+        setFocusAreas(data);
+      }
+    } catch (error) {
+      console.error('Error fetching focus areas:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (status === "loading" || loading) {
+    return (
+      <div className="min-h-screen bg-brand-bone flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-brand-plum border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-brand-plum font-mono uppercase tracking-widest">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-brand-bone">
@@ -150,39 +151,23 @@ export default function FocusAreasPage() {
                     <h3 className="text-2xl font-display font-bold text-brand-plum">{area.name}</h3>
                     <span
                       className={`px-3 py-1 text-xs font-mono uppercase font-bold ${
-                        area.status === "active"
+                        area.isActive
                           ? "bg-green-100 text-green-700"
                           : "bg-gray-100 text-gray-700"
                       }`}
                     >
-                      {area.status}
+                      {area.isActive ? "Active" : "Inactive"}
                     </span>
                   </div>
-                  <p className="text-brand-charcoal/80">{area.description}</p>
+                  <p className="text-brand-charcoal/80">{area.description || "No description provided"}</p>
                 </div>
                 <div className="flex gap-2">
                   <button className="px-4 py-2 border-2 border-brand-plum text-brand-plum font-mono text-xs uppercase tracking-widest hover:bg-brand-plum hover:text-brand-bone transition-all">
                     Edit
                   </button>
                   <button className="px-4 py-2 border-2 border-brand-plum text-brand-plum font-mono text-xs uppercase tracking-widest hover:bg-brand-plum hover:text-brand-bone transition-all">
-                    {area.status === "active" ? "Pause" : "Activate"}
+                    {area.isActive ? "Pause" : "Activate"}
                   </button>
-                </div>
-              </div>
-
-              {/* Stats */}
-              <div className="grid md:grid-cols-2 gap-4 mb-4">
-                <div className="p-4 bg-brand-bone border-l-4 border-brand-plum">
-                  <div className="text-3xl font-display font-bold text-brand-plum">{area.callsThisMonth}</div>
-                  <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60">
-                    Calls This Month
-                  </div>
-                </div>
-                <div className="p-4 bg-brand-bone border-l-4 border-brand-gold">
-                  <div className="text-3xl font-display font-bold text-brand-gold">{area.leadsGenerated}</div>
-                  <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60">
-                    Leads Generated
-                  </div>
                 </div>
               </div>
 
@@ -197,33 +182,31 @@ export default function FocusAreasPage() {
                       Industries
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {area.criteria.industries.map((industry, idx) => (
-                        <span
-                          key={idx}
-                          className="px-3 py-1 bg-brand-plum/10 text-brand-plum text-sm font-sans"
-                        >
-                          {industry}
-                        </span>
-                      ))}
+                      {area.targetIndustries.length > 0 ? (
+                        area.targetIndustries.map((industry, idx) => (
+                          <span
+                            key={idx}
+                            className="px-3 py-1 bg-brand-plum/10 text-brand-plum text-sm font-sans"
+                          >
+                            {industry}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-brand-charcoal/60 text-sm">No industries specified</span>
+                      )}
                     </div>
                   </div>
                   <div>
                     <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
                       Company Size
                     </div>
-                    <div className="text-brand-charcoal font-sans">{area.criteria.companySize}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
-                      Revenue Range
-                    </div>
-                    <div className="text-brand-charcoal font-sans">{area.criteria.revenue}</div>
+                    <div className="text-brand-charcoal font-sans">{area.companySize || "Not specified"}</div>
                   </div>
                   <div>
                     <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
                       Geography
                     </div>
-                    <div className="text-brand-charcoal font-sans">{area.criteria.geography}</div>
+                    <div className="text-brand-charcoal font-sans">{area.geography || "Not specified"}</div>
                   </div>
                 </div>
                 <div className="mt-4">
@@ -231,20 +214,35 @@ export default function FocusAreasPage() {
                     Target Titles
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {area.criteria.titles.map((title, idx) => (
-                      <span
-                        key={idx}
-                        className="px-3 py-1 bg-brand-gold/20 text-brand-plum text-sm font-sans font-bold"
-                      >
-                        {title}
-                      </span>
-                    ))}
+                    {area.targetTitles.length > 0 ? (
+                      area.targetTitles.map((title, idx) => (
+                        <span
+                          key={idx}
+                          className="px-3 py-1 bg-brand-gold/20 text-brand-plum text-sm font-sans font-bold"
+                        >
+                          {title}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-brand-charcoal/60 text-sm">No titles specified</span>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
+
+        {focusAreas.length === 0 && (
+          <div className="bg-white border-2 border-brand-plum p-12 text-center">
+            <p className="text-brand-charcoal/60 font-mono uppercase tracking-widest mb-4">
+              No focus areas configured yet
+            </p>
+            <p className="text-brand-charcoal/80 mb-6">
+              Focus areas help us target the right prospects for your business. Get started by adding your first focus area.
+            </p>
+          </div>
+        )}
 
         {/* Info Box */}
         <div className="mt-8 bg-brand-plum/5 border-2 border-brand-plum/20 p-6">

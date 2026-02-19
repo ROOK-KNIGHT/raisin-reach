@@ -1,141 +1,123 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+interface Lead {
+  id: string;
+  companyName: string;
+  contactName: string;
+  contactTitle: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  status: string;
+  budget: string | null;
+  timeline: string | null;
+  nextAction: string | null;
+  leadScore: number | null;
+  createdAt: string;
+}
 
 export default function LeadsPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const user = session?.user as any || { name: "Demo User" };
 
   const [filterStage, setFilterStage] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock leads data
-  const leads = [
-    {
-      id: 1,
-      company: "Global Manufacturing",
-      contact: "Mike Davis",
-      title: "VP of Operations",
-      email: "mike.davis@globalmanuf.com",
-      phone: "(555) 345-6789",
-      stage: "qualified",
-      budget: "$50,000+",
-      timeline: "Q1 2026",
-      bant: {
-        budget: "Confirmed",
-        authority: "Decision Maker",
-        need: "High Priority",
-        timeline: "Q1 2026",
-      },
-      nextAction: "Send proposal",
-      lastContact: "1 day ago",
-      score: 95,
-    },
-    {
-      id: 2,
-      company: "Enterprise Solutions LLC",
-      contact: "Lisa Chen",
-      title: "CTO",
-      email: "lisa.chen@enterprisesol.com",
-      phone: "(555) 456-7890",
-      stage: "qualified",
-      budget: "$75,000+",
-      timeline: "Immediate",
-      bant: {
-        budget: "Confirmed",
-        authority: "Decision Maker",
-        need: "Critical",
-        timeline: "Immediate",
-      },
-      nextAction: "Schedule demo",
-      lastContact: "1 day ago",
-      score: 98,
-    },
-    {
-      id: 3,
-      company: "Tech Innovations Inc",
-      contact: "James Wilson",
-      title: "Director of Sales",
-      email: "james.w@techinnovations.com",
-      phone: "(555) 789-0123",
-      stage: "contacted",
-      budget: "$30,000+",
-      timeline: "Q2 2026",
-      bant: {
-        budget: "Estimated",
-        authority: "Influencer",
-        need: "Medium Priority",
-        timeline: "Q2 2026",
-      },
-      nextAction: "Follow-up call",
-      lastContact: "3 days ago",
-      score: 72,
-    },
-    {
-      id: 4,
-      company: "Digital Marketing Co",
-      contact: "Amanda Rodriguez",
-      title: "Marketing Manager",
-      email: "amanda@digitalmarketing.co",
-      phone: "(555) 890-1234",
-      stage: "nurture",
-      budget: "$20,000+",
-      timeline: "Q3 2026",
-      bant: {
-        budget: "Unconfirmed",
-        authority: "Influencer",
-        need: "Low Priority",
-        timeline: "Q3 2026",
-      },
-      nextAction: "Send resources",
-      lastContact: "1 week ago",
-      score: 45,
-    },
-    {
-      id: 5,
-      company: "Startup Ventures",
-      contact: "Robert Williams",
-      title: "CEO",
-      email: "robert@startupventures.io",
-      phone: "(555) 567-8901",
-      stage: "contacted",
-      budget: "$15,000+",
-      timeline: "TBD",
-      bant: {
-        budget: "Limited",
-        authority: "Decision Maker",
-        need: "Exploring",
-        timeline: "TBD",
-      },
-      nextAction: "Retry contact",
-      lastContact: "2 days ago",
-      score: 58,
-    },
-  ];
+  // Fetch leads from API
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetchLeads();
+    } else if (status === "unauthenticated") {
+      router.push("/auth/signin");
+    }
+  }, [status, router]);
 
+  const fetchLeads = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/portal/leads');
+      if (res.ok) {
+        const data = await res.json();
+        setLeads(data);
+      }
+    } catch (error) {
+      console.error('Error fetching leads:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (status === "loading" || loading) {
+    return (
+      <div className="min-h-screen bg-brand-bone flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-brand-plum border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-brand-plum font-mono uppercase tracking-widest">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Mock BANT data - in a real app, this would come from the database
+  const getBantData = (lead: Lead) => {
+    return {
+      budget: lead.budget || "Unconfirmed",
+      authority: lead.contactTitle?.includes("VP") || lead.contactTitle?.includes("Director") || lead.contactTitle?.includes("CEO") || lead.contactTitle?.includes("CTO") ? "Decision Maker" : "Influencer",
+      need: lead.status === "QUALIFIED" || lead.status === "MEETING_SCHEDULED" ? "High Priority" : "Medium Priority",
+      timeline: lead.timeline || "TBD",
+    };
+  };
+
+  // Removed mock leads array - now using real data from API
   const filteredLeads = leads.filter((lead) => {
-    const matchesStage = filterStage === "all" || lead.stage === filterStage;
+    const matchesStage = filterStage === "all" || lead.status === filterStage;
     const matchesSearch =
-      lead.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lead.contact.toLowerCase().includes(searchQuery.toLowerCase());
+      lead.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lead.contactName.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesStage && matchesSearch;
   });
 
-  const getStageBadge = (stage: string) => {
-    const badges = {
-      qualified: "bg-brand-gold text-brand-plum",
-      contacted: "bg-blue-100 text-blue-700",
-      nurture: "bg-purple-100 text-purple-700",
+  const getStageBadge = (status: string) => {
+    const badges: Record<string, string> = {
+      'NEW': "bg-blue-100 text-blue-700",
+      'CONTACTED': "bg-purple-100 text-purple-700",
+      'QUALIFIED': "bg-brand-gold text-brand-plum",
+      'MEETING_SCHEDULED': "bg-green-100 text-green-700",
+      'PROPOSAL_SENT': "bg-yellow-100 text-yellow-700",
+      'NEGOTIATION': "bg-orange-100 text-orange-700",
+      'CLOSED_WON': "bg-green-600 text-white",
+      'CLOSED_LOST': "bg-red-100 text-red-700",
     };
-    return badges[stage as keyof typeof badges] || "bg-gray-100 text-gray-700";
+    return badges[status] || "bg-gray-100 text-gray-700";
   };
 
-  const getScoreColor = (score: number) => {
+  const getScoreColor = (score: number | null) => {
+    if (!score) return "text-gray-600";
     if (score >= 80) return "text-green-600";
     if (score >= 60) return "text-yellow-600";
     return "text-red-600";
+  };
+
+  // Helper function to format date
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    
+    if (diffHours < 1) return 'Less than an hour ago';
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return `${Math.floor(diffDays / 7)} weeks ago`;
   };
 
   return (
@@ -238,9 +220,14 @@ export default function LeadsPage() {
                 className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
               >
                 <option value="all">All Stages</option>
-                <option value="qualified">Qualified</option>
-                <option value="contacted">Contacted</option>
-                <option value="nurture">Nurture</option>
+                <option value="NEW">New</option>
+                <option value="CONTACTED">Contacted</option>
+                <option value="QUALIFIED">Qualified</option>
+                <option value="MEETING_SCHEDULED">Meeting Scheduled</option>
+                <option value="PROPOSAL_SENT">Proposal Sent</option>
+                <option value="NEGOTIATION">Negotiation</option>
+                <option value="CLOSED_WON">Closed Won</option>
+                <option value="CLOSED_LOST">Closed Lost</option>
               </select>
             </div>
           </div>
@@ -248,82 +235,88 @@ export default function LeadsPage() {
 
         {/* Leads List */}
         <div className="space-y-6">
-          {filteredLeads.map((lead) => (
-            <div
-              key={lead.id}
-              className="bg-white border-2 border-brand-plum p-6 shadow-[2px_2px_0px_0px_var(--color-brand-plum)]"
-            >
-              {/* Header */}
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-2xl font-display font-bold text-brand-plum">{lead.company}</h3>
-                    <span className={`px-3 py-1 text-xs font-mono uppercase font-bold ${getStageBadge(lead.stage)}`}>
-                      {lead.stage}
-                    </span>
+          {filteredLeads.map((lead) => {
+            const bant = getBantData(lead);
+            return (
+              <div
+                key={lead.id}
+                className="bg-white border-2 border-brand-plum p-6 shadow-[2px_2px_0px_0px_var(--color-brand-plum)]"
+              >
+                {/* Header */}
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-2xl font-display font-bold text-brand-plum">{lead.companyName}</h3>
+                      <span className={`px-3 py-1 text-xs font-mono uppercase font-bold ${getStageBadge(lead.status)}`}>
+                        {lead.status.replace('_', ' ')}
+                      </span>
+                    </div>
+                    <div className="text-brand-charcoal/80 mb-1">
+                      <strong>{lead.contactName}</strong>
+                      {lead.contactTitle && ` • ${lead.contactTitle}`}
+                    </div>
+                    <div className="text-sm text-brand-charcoal/60">
+                      {lead.contactEmail && `${lead.contactEmail}`}
+                      {lead.contactEmail && lead.contactPhone && ' • '}
+                      {lead.contactPhone && `${lead.contactPhone}`}
+                    </div>
                   </div>
-                  <div className="text-brand-charcoal/80 mb-1">
-                    <strong>{lead.contact}</strong> • {lead.title}
-                  </div>
-                  <div className="text-sm text-brand-charcoal/60">
-                    {lead.email} • {lead.phone}
+                  <div className="text-right">
+                    <div className={`text-4xl font-display font-bold ${getScoreColor(lead.leadScore)}`}>
+                      {lead.leadScore || 'N/A'}
+                    </div>
+                    <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60">
+                      Lead Score
+                    </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className={`text-4xl font-display font-bold ${getScoreColor(lead.score)}`}>
-                    {lead.score}
-                  </div>
-                  <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60">
-                    Lead Score
-                  </div>
-                </div>
-              </div>
 
-              {/* BANT Qualification */}
-              <div className="grid md:grid-cols-4 gap-4 mb-4 p-4 bg-brand-bone border-l-4 border-brand-gold">
-                <div>
-                  <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
-                    Budget
+                {/* BANT Qualification */}
+                <div className="grid md:grid-cols-4 gap-4 mb-4 p-4 bg-brand-bone border-l-4 border-brand-gold">
+                  <div>
+                    <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
+                      Budget
+                    </div>
+                    <div className="font-bold text-brand-plum">{bant.budget}</div>
+                    {lead.budget && <div className="text-sm text-brand-charcoal/80">{lead.budget}</div>}
                   </div>
-                  <div className="font-bold text-brand-plum">{lead.bant.budget}</div>
-                  <div className="text-sm text-brand-charcoal/80">{lead.budget}</div>
-                </div>
-                <div>
-                  <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
-                    Authority
+                  <div>
+                    <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
+                      Authority
+                    </div>
+                    <div className="font-bold text-brand-plum">{bant.authority}</div>
                   </div>
-                  <div className="font-bold text-brand-plum">{lead.bant.authority}</div>
-                </div>
-                <div>
-                  <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
-                    Need
+                  <div>
+                    <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
+                      Need
+                    </div>
+                    <div className="font-bold text-brand-plum">{bant.need}</div>
                   </div>
-                  <div className="font-bold text-brand-plum">{lead.bant.need}</div>
-                </div>
-                <div>
-                  <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
-                    Timeline
+                  <div>
+                    <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
+                      Timeline
+                    </div>
+                    <div className="font-bold text-brand-plum">{bant.timeline}</div>
                   </div>
-                  <div className="font-bold text-brand-plum">{lead.bant.timeline}</div>
                 </div>
-              </div>
 
-              {/* Footer */}
-              <div className="flex justify-between items-center pt-4 border-t-2 border-brand-plum/10">
-                <div>
-                  <span className="text-sm text-brand-charcoal/60">Next Action: </span>
-                  <span className="font-bold text-brand-plum">{lead.nextAction}</span>
-                  <span className="text-sm text-brand-charcoal/60 ml-4">Last Contact: {lead.lastContact}</span>
+                {/* Footer */}
+                <div className="flex justify-between items-center pt-4 border-t-2 border-brand-plum/10">
+                  <div>
+                    <span className="text-sm text-brand-charcoal/60">Next Action: </span>
+                    <span className="font-bold text-brand-plum">{lead.nextAction || 'Follow up'}</span>
+                    <span className="text-sm text-brand-charcoal/60 ml-4">Created: {formatDate(lead.createdAt)}</span>
+                  </div>
+                  <Link
+                    href={`/portal/leads/${lead.id}`}
+                    className="px-6 py-2 bg-brand-plum text-brand-bone font-mono text-sm uppercase tracking-widest hover:bg-brand-gold hover:text-brand-plum transition-all inline-block"
+                  >
+                    View Details
+                  </Link>
                 </div>
-                <Link
-                  href={`/portal/leads/${lead.id}`}
-                  className="px-6 py-2 bg-brand-plum text-brand-bone font-mono text-sm uppercase tracking-widest hover:bg-brand-gold hover:text-brand-plum transition-all inline-block"
-                >
-                  View Details
-                </Link>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {filteredLeads.length === 0 && (

@@ -3,102 +3,106 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+interface CallLog {
+  id: string;
+  prospectName: string;
+  prospectCompany: string;
+  prospectPhone: string | null;
+  callOutcome: string;
+  callDuration: number | null;
+  notes: string | null;
+  callDate: string;
+}
 
 export default function CallLogsPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const user = session?.user as any || { name: "Demo User" };
 
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [callLogs, setCallLogs] = useState<CallLog[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock call logs data
-  const callLogs = [
-    {
-      id: 1,
-      contactName: "John Smith",
-      company: "Acme Corp",
-      phone: "(555) 123-4567",
-      status: "connected",
-      duration: "12:34",
-      notes: "Discussed Q1 needs, scheduling follow-up meeting for next week",
-      timestamp: "2 hours ago",
-      outcome: "Meeting Scheduled",
-    },
-    {
-      id: 2,
-      contactName: "Sarah Johnson",
-      company: "Tech Solutions Inc",
-      phone: "(555) 234-5678",
-      status: "voicemail",
-      duration: "0:45",
-      notes: "Left message about our services and pricing",
-      timestamp: "5 hours ago",
-      outcome: "Follow-up Required",
-    },
-    {
-      id: 3,
-      contactName: "Mike Davis",
-      company: "Global Manufacturing",
-      phone: "(555) 345-6789",
-      status: "connected",
-      duration: "18:22",
-      notes: "Qualified lead - Budget $50K+, Timeline Q1 2026. Sending proposal.",
-      timestamp: "1 day ago",
-      outcome: "Qualified Lead",
-    },
-    {
-      id: 4,
-      contactName: "Lisa Chen",
-      company: "Enterprise Solutions LLC",
-      phone: "(555) 456-7890",
-      status: "connected",
-      duration: "15:10",
-      notes: "Hot lead - Budget $75K+, immediate timeline. Scheduling demo.",
-      timestamp: "1 day ago",
-      outcome: "Demo Scheduled",
-    },
-    {
-      id: 5,
-      contactName: "Robert Williams",
-      company: "Startup Ventures",
-      phone: "(555) 567-8901",
-      status: "no-answer",
-      duration: "0:00",
-      notes: "No answer, will try again tomorrow",
-      timestamp: "2 days ago",
-      outcome: "Retry",
-    },
-    {
-      id: 6,
-      contactName: "Emily Brown",
-      company: "Marketing Pro",
-      phone: "(555) 678-9012",
-      status: "connected",
-      duration: "8:45",
-      notes: "Not interested at this time, follow up in 6 months",
-      timestamp: "2 days ago",
-      outcome: "Not Interested",
-    },
-  ];
+  // Fetch call logs from API
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetchCallLogs();
+    } else if (status === "unauthenticated") {
+      router.push("/auth/signin");
+    }
+  }, [status, router]);
+
+  const fetchCallLogs = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/portal/calls');
+      if (res.ok) {
+        const data = await res.json();
+        setCallLogs(data);
+      }
+    } catch (error) {
+      console.error('Error fetching call logs:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (status === "loading" || loading) {
+    return (
+      <div className="min-h-screen bg-brand-bone flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-brand-plum border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-brand-plum font-mono uppercase tracking-widest">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Helper function to format call outcome
+  const formatOutcome = (outcome: string) => {
+    const outcomeMap: Record<string, { label: string; color: string }> = {
+      'CONNECTED': { label: 'Connected', color: 'bg-green-100 text-green-700' },
+      'SCHEDULED_MEETING': { label: 'Meeting Scheduled', color: 'bg-blue-100 text-blue-700' },
+      'VOICEMAIL': { label: 'Voicemail', color: 'bg-yellow-100 text-yellow-700' },
+      'NO_ANSWER': { label: 'No Answer', color: 'bg-gray-100 text-gray-700' },
+      'GATEKEEPER': { label: 'Gatekeeper', color: 'bg-orange-100 text-orange-700' },
+      'NOT_INTERESTED': { label: 'Not Interested', color: 'bg-red-100 text-red-700' },
+    };
+    return outcomeMap[outcome] || { label: outcome, color: 'bg-gray-100 text-gray-700' };
+  };
+
+  // Helper function to format date
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    
+    if (diffHours < 1) return 'Less than an hour ago';
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) return 'Yesterday';
+    return `${diffDays} days ago`;
+  };
+
+  // Helper function to format duration
+  const formatDuration = (seconds: number | null) => {
+    if (!seconds) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const filteredLogs = callLogs.filter((log) => {
-    const matchesStatus = filterStatus === "all" || log.status === filterStatus;
+    const matchesStatus = filterStatus === "all" || log.callOutcome === filterStatus;
     const matchesSearch =
-      log.contactName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      log.company.toLowerCase().includes(searchQuery.toLowerCase());
+      log.prospectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      log.prospectCompany.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesStatus && matchesSearch;
   });
-
-  const getStatusBadge = (status: string) => {
-    const badges = {
-      connected: "bg-green-100 text-green-700",
-      voicemail: "bg-yellow-100 text-yellow-700",
-      "no-answer": "bg-red-100 text-red-700",
-    };
-    return badges[status as keyof typeof badges] || "bg-gray-100 text-gray-700";
-  };
 
   return (
     <main className="min-h-screen bg-brand-bone">
@@ -200,9 +204,12 @@ export default function CallLogsPage() {
                 className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
               >
                 <option value="all">All Calls</option>
-                <option value="connected">Connected</option>
-                <option value="voicemail">Voicemail</option>
-                <option value="no-answer">No Answer</option>
+                <option value="CONNECTED">Connected</option>
+                <option value="SCHEDULED_MEETING">Meeting Scheduled</option>
+                <option value="VOICEMAIL">Voicemail</option>
+                <option value="NO_ANSWER">No Answer</option>
+                <option value="GATEKEEPER">Gatekeeper</option>
+                <option value="NOT_INTERESTED">Not Interested</option>
               </select>
             </div>
           </div>
@@ -210,40 +217,46 @@ export default function CallLogsPage() {
 
         {/* Call Logs List */}
         <div className="space-y-4">
-          {filteredLogs.map((log) => (
-            <div
-              key={log.id}
-              className="bg-white border-2 border-brand-plum p-6 shadow-[2px_2px_0px_0px_var(--color-brand-plum)]"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-display font-bold text-brand-plum">{log.contactName}</h3>
-                    <span
-                      className={`px-3 py-1 text-xs font-mono uppercase ${getStatusBadge(log.status)}`}
-                    >
-                      {log.status.replace("-", " ")}
+          {filteredLogs.map((log) => {
+            const outcome = formatOutcome(log.callOutcome);
+            return (
+              <div
+                key={log.id}
+                className="bg-white border-2 border-brand-plum p-6 shadow-[2px_2px_0px_0px_var(--color-brand-plum)]"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-xl font-display font-bold text-brand-plum">{log.prospectName}</h3>
+                      <span
+                        className={`px-3 py-1 text-xs font-mono uppercase ${outcome.color}`}
+                      >
+                        {outcome.label}
+                      </span>
+                    </div>
+                    <div className="text-brand-charcoal/60 mb-1">
+                      <strong>{log.prospectCompany}</strong>
+                      {log.prospectPhone && ` • ${log.prospectPhone}`}
+                    </div>
+                    <div className="text-sm text-brand-charcoal/60">
+                      Duration: {formatDuration(log.callDuration)} • {formatDate(log.callDate)}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="px-4 py-2 bg-brand-gold/20 text-brand-plum font-mono text-sm uppercase tracking-widest font-bold">
+                      {outcome.label}
                     </span>
                   </div>
-                  <div className="text-brand-charcoal/60 mb-1">
-                    <strong>{log.company}</strong> • {log.phone}
-                  </div>
-                  <div className="text-sm text-brand-charcoal/60">
-                    Duration: {log.duration} • {log.timestamp}
-                  </div>
                 </div>
-                <div className="text-right">
-                  <span className="px-4 py-2 bg-brand-gold/20 text-brand-plum font-mono text-sm uppercase tracking-widest font-bold">
-                    {log.outcome}
-                  </span>
-                </div>
+                {log.notes && (
+                  <div className="border-t-2 border-brand-plum/10 pt-4">
+                    <p className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">Notes</p>
+                    <p className="text-brand-charcoal">{log.notes}</p>
+                  </div>
+                )}
               </div>
-              <div className="border-t-2 border-brand-plum/10 pt-4">
-                <p className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">Notes</p>
-                <p className="text-brand-charcoal">{log.notes}</p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {filteredLogs.length === 0 && (

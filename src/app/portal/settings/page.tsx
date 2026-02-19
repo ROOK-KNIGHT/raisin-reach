@@ -1,23 +1,53 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function SettingsPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const user = session?.user as any || { name: "Demo User", email: "demo@example.com" };
 
   const [activeTab, setActiveTab] = useState("profile");
+  const [loading, setLoading] = useState(true);
 
-  // Mock settings data
+  // Profile data from session
   const [profileData, setProfileData] = useState({
-    name: user.name || "Demo User",
-    email: user.email || "demo@example.com",
-    company: "Acme Corporation",
-    phone: "(555) 123-4567",
+    name: "",
+    email: "",
+    company: "",
+    phone: "",
     timezone: "America/New_York",
   });
+
+  // Load user data from session
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      setProfileData({
+        name: user.name || "",
+        email: user.email || "",
+        company: user.company || "",
+        phone: user.phone || "",
+        timezone: "America/New_York",
+      });
+      setLoading(false);
+    } else if (status === "unauthenticated") {
+      router.push("/auth/signin");
+    }
+  }, [status, session, router, user]);
+
+  if (status === "loading" || loading) {
+    return (
+      <div className="min-h-screen bg-brand-bone flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-brand-plum border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-brand-plum font-mono uppercase tracking-widest">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   const [notificationSettings, setNotificationSettings] = useState({
     emailOnNewLead: true,
@@ -26,12 +56,13 @@ export default function SettingsPage() {
     smsOnHotLead: false,
   });
 
-  const [billingInfo, setBillingInfo] = useState({
-    plan: "Professional",
-    status: "Active",
+  // Billing info - in a real app, this would come from a subscription service
+  const billingInfo = {
+    plan: user.membershipTier || "Professional",
+    status: user.membershipStatus || "Active",
     nextBillingDate: "March 15, 2026",
     amount: "$2,500/month",
-  });
+  };
 
   return (
     <main className="min-h-screen bg-brand-bone">
