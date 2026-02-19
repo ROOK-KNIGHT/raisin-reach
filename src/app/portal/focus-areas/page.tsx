@@ -8,13 +8,14 @@ import AddFocusAreaModal from "@/components/portal/AddFocusAreaModal";
 
 interface FocusArea {
   id: string;
-  name: string;
+  title: string;
   description: string | null;
-  targetIndustries: string[];
-  targetTitles: string[];
-  companySize: string | null;
-  geography: string | null;
+  targetIndustry: string | null;
+  targetJobTitles: string[];
+  targetCompanySize: string | null;
+  targetLocation: string | null;
   isActive: boolean;
+  priority: string;
   createdAt: string;
 }
 
@@ -153,7 +154,7 @@ export default function FocusAreasPage() {
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-2xl font-display font-bold text-brand-plum">{area.name}</h3>
+                    <h3 className="text-2xl font-display font-bold text-brand-plum">{area.title}</h3>
                     <span
                       className={`px-3 py-1 text-xs font-mono uppercase font-bold ${
                         area.isActive
@@ -184,43 +185,30 @@ export default function FocusAreasPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
-                      Industries
+                      Industry
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {area.targetIndustries.length > 0 ? (
-                        area.targetIndustries.map((industry, idx) => (
-                          <span
-                            key={idx}
-                            className="px-3 py-1 bg-brand-plum/10 text-brand-plum text-sm font-sans"
-                          >
-                            {industry}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-brand-charcoal/60 text-sm">No industries specified</span>
-                      )}
-                    </div>
+                    <div className="text-brand-charcoal font-sans">{area.targetIndustry || "Not specified"}</div>
                   </div>
                   <div>
                     <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
                       Company Size
                     </div>
-                    <div className="text-brand-charcoal font-sans">{area.companySize || "Not specified"}</div>
+                    <div className="text-brand-charcoal font-sans">{area.targetCompanySize || "Not specified"}</div>
                   </div>
                   <div>
                     <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
-                      Geography
+                      Location
                     </div>
-                    <div className="text-brand-charcoal font-sans">{area.geography || "Not specified"}</div>
+                    <div className="text-brand-charcoal font-sans">{area.targetLocation || "Not specified"}</div>
                   </div>
                 </div>
                 <div className="mt-4">
                   <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
-                    Target Titles
+                    Target Job Titles
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {area.targetTitles.length > 0 ? (
-                      area.targetTitles.map((title, idx) => (
+                    {area.targetJobTitles && area.targetJobTitles.length > 0 ? (
+                      area.targetJobTitles.map((title, idx) => (
                         <span
                           key={idx}
                           className="px-3 py-1 bg-brand-gold/20 text-brand-plum text-sm font-sans font-bold"
