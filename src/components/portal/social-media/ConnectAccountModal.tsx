@@ -50,17 +50,28 @@ export default function ConnectAccountModal({ isOpen, onClose, onConnect }: Conn
   };
 
   const handleConnect = async (platform: string) => {
-    // TODO: Implement OAuth flow for each platform
-    // This should redirect to the platform's OAuth authorization page
-    // and handle the callback to store the access tokens
-    
-    toast.error(`OAuth integration for ${platform} not yet implemented. Please configure OAuth credentials and implement the authorization flow.`);
-    
-    // Example OAuth flow structure:
-    // 1. Redirect to: https://platform.com/oauth/authorize?client_id=...&redirect_uri=...
-    // 2. Handle callback at: /api/auth/callback/[platform]
-    // 3. Exchange code for access token
-    // 4. Store encrypted tokens in database
+    // Redirect to OAuth authorization endpoint
+    const platformRoutes: Record<string, string> = {
+      'TWITTER': '/api/auth/social/twitter',
+      'FACEBOOK': '/api/auth/social/facebook',
+      'INSTAGRAM': '/api/auth/social/instagram',
+      'LINKEDIN': '/api/auth/social/linkedin',
+      'TIKTOK': '/api/auth/social/tiktok',
+      'YOUTUBE': '/api/auth/social/youtube',
+    };
+
+    const route = platformRoutes[platform];
+    if (!route) {
+      toast.error(`OAuth integration for ${platform} not yet implemented.`);
+      return;
+    }
+
+    // For Twitter, we have the OAuth flow implemented
+    if (platform === 'TWITTER') {
+      window.location.href = route;
+    } else {
+      toast.error(`OAuth integration for ${platform} not yet implemented. Please configure OAuth credentials and implement the authorization flow.`);
+    }
   };
 
   const handleDisconnect = async (id: string) => {
