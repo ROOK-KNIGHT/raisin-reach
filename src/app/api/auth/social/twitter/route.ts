@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const clientId = process.env.TWITTER_CONSUMER_KEY;
+    const clientId = process.env.TWITTER_CLIENT_ID;
     const redirectUri = `${process.env.NEXTAUTH_URL}/api/auth/social/twitter/callback`;
     
     if (!clientId) {

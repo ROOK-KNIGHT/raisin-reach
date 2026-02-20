@@ -40,13 +40,13 @@ export async function GET(request: NextRequest) {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Authorization': `Basic ${Buffer.from(
-          `${process.env.TWITTER_CONSUMER_KEY}:${process.env.TWITTER_CONSUMER_SECRET}`
+          `${process.env.TWITTER_CLIENT_ID}:${process.env.TWITTER_CLIENT_SECRET}`
         ).toString('base64')}`,
       },
       body: new URLSearchParams({
         code,
         grant_type: 'authorization_code',
-        client_id: process.env.TWITTER_CONSUMER_KEY!,
+        client_id: process.env.TWITTER_CLIENT_ID!,
         redirect_uri: `${process.env.NEXTAUTH_URL}/api/auth/social/twitter/callback`,
         code_verifier: 'challenge',
       }),
