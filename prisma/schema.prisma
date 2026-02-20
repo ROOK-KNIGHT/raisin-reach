@@ -70,6 +70,10 @@ model User {
   laborRates        LaborRate[]
   taxSettings       TaxSettings?
   
+  // Social Media
+  socialMediaAccounts SocialMediaAccount[]
+  socialPosts         SocialPost[]
+  
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -316,4 +320,63 @@ enum Frequency {
   MONTHLY
   QUARTERLY
   YEARLY
+}
+
+// Social Media Models
+model SocialMediaAccount {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platform          SocialPlatform
+  accountName       String
+  accountId         String   // Platform-specific account ID
+  accessToken       String   @db.Text // Encrypted
+  refreshToken      String?  @db.Text // Encrypted
+  tokenExpiry       DateTime?
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  posts             SocialPost[]
+  
+  @@unique([userId, platform, accountId])
+  @@index([userId])
+}
+
+model SocialPost {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId         String
+  account           SocialMediaAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  content           String   @db.Text
+  mediaUrls         String[] // Array of media URLs
+  scheduledFor      DateTime?
+  publishedAt       DateTime?
+  status            PostStatus @default(DRAFT)
+  platformPostId    String?  // ID from the platform after posting
+  engagement        Json?    // Likes, comments, shares, etc.
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([accountId])
+  @@index([status])
+  @@index([scheduledFor])
+}
+
+enum SocialPlatform {
+  FACEBOOK
+  INSTAGRAM
+  LINKEDIN
+  TWITTER
+  TIKTOK
+  YOUTUBE
+}
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHING
+  PUBLISHED
+  FAILED
 }
