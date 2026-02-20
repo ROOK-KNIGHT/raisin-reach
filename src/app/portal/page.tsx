@@ -156,48 +156,48 @@ export default function PortalDashboard() {
       </header>
 
       {/* Navigation */}
-      <nav className="bg-white border-b-2 border-brand-plum/20 overflow-x-auto">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="flex gap-2 md:gap-8">
+      <nav className="bg-white border-b-2 border-brand-plum/20 overflow-x-auto -mx-6 px-6 md:mx-0 md:px-0">
+        <div className="max-w-7xl md:mx-auto md:px-6">
+          <div className="flex gap-1 md:gap-8">
             <Link
               href="/portal"
-              className="px-3 md:px-4 py-4 border-b-4 border-brand-plum text-brand-plum font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap"
+              className="px-2 md:px-4 py-4 border-b-4 border-brand-plum text-brand-plum font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap flex-shrink-0"
             >
               Dashboard
             </Link>
             <Link
               href="/portal/call-logs"
-              className="px-3 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap"
+              className="px-2 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap flex-shrink-0"
             >
               Call Logs
             </Link>
             <Link
               href="/portal/leads"
-              className="px-3 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap"
+              className="px-2 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap flex-shrink-0"
             >
               Leads
             </Link>
             <Link
               href="/portal/focus-areas"
-              className="px-3 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap"
+              className="px-2 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap flex-shrink-0"
             >
               Focus Areas
             </Link>
             <Link
               href="/portal/profit-estimator"
-              className="px-3 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap"
+              className="px-2 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap flex-shrink-0"
             >
               Profit Estimator
             </Link>
             <Link
               href="/portal/social-media"
-              className="px-3 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap"
+              className="px-2 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap flex-shrink-0"
             >
               Social Media
             </Link>
             <Link
               href="/portal/settings"
-              className="px-3 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap"
+              className="px-2 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap flex-shrink-0"
             >
               Settings
             </Link>
