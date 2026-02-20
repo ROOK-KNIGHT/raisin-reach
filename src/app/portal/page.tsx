@@ -157,8 +157,8 @@ export default function PortalDashboard() {
 
       {/* Navigation */}
       <nav className="bg-white border-b-2 border-brand-plum/20 overflow-x-auto">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex gap-4 md:gap-8 min-w-max">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="flex gap-2 md:gap-8">
             <Link
               href="/portal"
               className="px-3 md:px-4 py-4 border-b-4 border-brand-plum text-brand-plum font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap"
