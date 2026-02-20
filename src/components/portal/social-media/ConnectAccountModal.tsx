@@ -50,40 +50,17 @@ export default function ConnectAccountModal({ isOpen, onClose, onConnect }: Conn
   };
 
   const handleConnect = async (platform: string) => {
-    // In a real app, this would redirect to OAuth flow
-    // For this implementation, we'll simulate a connection
-    const mockAccountName = prompt(`Enter ${platform} account name to simulate connection:`);
-    if (!mockAccountName) return;
-
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/portal/social-media/accounts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          platform,
-          accountName: mockAccountName,
-          accountId: `mock-${platform}-${Date.now()}`,
-          accessToken: `mock-token-${Date.now()}`,
-          // refreshToken: '...',
-          // tokenExpiry: '...',
-        }),
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        toast.success(`Connected to ${platform}`);
-        fetchAccounts();
-        onConnect();
-      } else {
-        toast.error(data.error || "Failed to connect");
-      }
-    } catch (error) {
-      console.error("Error connecting:", error);
-      toast.error("An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
+    // TODO: Implement OAuth flow for each platform
+    // This should redirect to the platform's OAuth authorization page
+    // and handle the callback to store the access tokens
+    
+    toast.error(`OAuth integration for ${platform} not yet implemented. Please configure OAuth credentials and implement the authorization flow.`);
+    
+    // Example OAuth flow structure:
+    // 1. Redirect to: https://platform.com/oauth/authorize?client_id=...&redirect_uri=...
+    // 2. Handle callback at: /api/auth/callback/[platform]
+    // 3. Exchange code for access token
+    // 4. Store encrypted tokens in database
   };
 
   const handleDisconnect = async (id: string) => {
