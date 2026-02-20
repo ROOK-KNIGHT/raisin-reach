@@ -156,48 +156,48 @@ export default function PortalDashboard() {
       </header>
 
       {/* Navigation */}
-      <nav className="bg-white border-b-2 border-brand-plum/20">
+      <nav className="bg-white border-b-2 border-brand-plum/20 overflow-x-auto">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex gap-8">
+          <div className="flex gap-4 md:gap-8 min-w-max">
             <Link
               href="/portal"
-              className="px-4 py-4 border-b-4 border-brand-plum text-brand-plum font-bold uppercase tracking-wider text-sm"
+              className="px-3 md:px-4 py-4 border-b-4 border-brand-plum text-brand-plum font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap"
             >
               Dashboard
             </Link>
             <Link
               href="/portal/call-logs"
-              className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
+              className="px-3 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap"
             >
               Call Logs
             </Link>
             <Link
               href="/portal/leads"
-              className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
+              className="px-3 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap"
             >
               Leads
             </Link>
             <Link
               href="/portal/focus-areas"
-              className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
+              className="px-3 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap"
             >
               Focus Areas
             </Link>
             <Link
               href="/portal/profit-estimator"
-              className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
+              className="px-3 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap"
             >
               Profit Estimator
             </Link>
             <Link
               href="/portal/social-media"
-              className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
+              className="px-3 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap"
             >
               Social Media
             </Link>
             <Link
               href="/portal/settings"
-              className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
+              className="px-3 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap"
             >
               Settings
             </Link>
