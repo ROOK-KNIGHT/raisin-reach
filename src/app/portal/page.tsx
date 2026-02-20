@@ -190,6 +190,12 @@ export default function PortalDashboard() {
               Profit Estimator
             </Link>
             <Link
+              href="/portal/social-media"
+              className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
+            >
+              Social Media
+            </Link>
+            <Link
               href="/portal/settings"
               className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
             >
