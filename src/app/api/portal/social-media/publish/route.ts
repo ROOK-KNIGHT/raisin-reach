@@ -4,6 +4,30 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { decrypt } from "@/lib/encryption";
 
+// Helper function to publish to Twitter
+async function publishToTwitter(accessToken: string, content: string, mediaUrls: string[]): Promise<string> {
+  // Post tweet using Twitter API v2
+  const response = await fetch('https://api.twitter.com/2/tweets', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      text: content,
+      // TODO: Add media support if mediaUrls are provided
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(`Twitter API error: ${JSON.stringify(errorData)}`);
+  }
+
+  const data = await response.json();
+  return data.data.id; // Return the tweet ID
+}
+
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -44,25 +68,54 @@ export async function POST(req: Request) {
     // Decrypt access token to be used for publishing
     const accessToken = decrypt(post.account.accessToken);
 
-    // TODO: Implement actual publishing logic for each platform using the decrypted token
-    // switch (post.account.platform) {
-    //   case 'FACEBOOK':
-    //     await publishToFacebook(accessToken, post.content, post.mediaUrls);
-    //     break;
-    //   ...
-    // }
-
-    // Simulating successful publishing
-    const updatedPost = await prisma.socialPost.update({
+    // Update status to PUBLISHING
+    await prisma.socialPost.update({
       where: { id: postId },
-      data: {
-        status: "PUBLISHED",
-        publishedAt: new Date(),
-        platformPostId: `mock-id-${Date.now()}`,
-      },
+      data: { status: "PUBLISHING" },
     });
 
-    return NextResponse.json({ success: true, data: updatedPost });
+    let platformPostId: string | null = null;
+
+    try {
+      // Publish to the appropriate platform
+      switch (post.account.platform) {
+        case 'TWITTER':
+          platformPostId = await publishToTwitter(accessToken, post.content, post.mediaUrls);
+          break;
+        case 'FACEBOOK':
+        case 'INSTAGRAM':
+        case 'LINKEDIN':
+        case 'TIKTOK':
+        case 'YOUTUBE':
+          throw new Error(`Publishing to ${post.account.platform} not yet implemented`);
+        default:
+          throw new Error(`Unknown platform: ${post.account.platform}`);
+      }
+
+      // Update post as published
+      const updatedPost = await prisma.socialPost.update({
+        where: { id: postId },
+        data: {
+          status: "PUBLISHED",
+          publishedAt: new Date(),
+          platformPostId,
+        },
+      });
+
+      return NextResponse.json({ success: true, data: updatedPost });
+    } catch (publishError: any) {
+      // Mark as failed if publishing fails
+      await prisma.socialPost.update({
+        where: { id: postId },
+        data: { status: "FAILED" },
+      });
+
+      console.error("Publishing error:", publishError);
+      return NextResponse.json({ 
+        success: false, 
+        error: publishError.message || "Failed to publish post" 
+      }, { status: 500 });
+    }
   } catch (error) {
     console.error("Error publishing post:", error);
     return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
