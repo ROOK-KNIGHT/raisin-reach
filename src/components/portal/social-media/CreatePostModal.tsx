@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { SocialPlatform } from "@prisma/client";
+type SocialPlatform = "FACEBOOK" | "INSTAGRAM" | "LINKEDIN" | "TWITTER" | "TIKTOK" | "YOUTUBE";
 
 interface SocialAccount {
   id: string;
@@ -258,30 +258,60 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
                   const createData = await createResponse.json();
                   if (!createData.success) {
                     toast.error(createData.error || "Failed to create post");
+                    setIsSubmitting(false);
                     return;
                   }
 
-                  // Publish immediately
-                  const publishResponse = await fetch("/api/portal/social-media/publish", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      postId: createData.data[0].id, // Use first created post
-                    }),
-                  });
+                  // Publish immediately for each created post
+                  const posts = createData.data;
+                  const results = await Promise.all(
+                    posts.map(async (post: any) => {
+                      try {
+                        const response = await fetch("/api/portal/social-media/publish", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            postId: post.id,
+                          }),
+                        });
+                        const data = await response.json();
+                        return { 
+                          platform: post.account?.platform || 'Unknown', 
+                          success: data.success, 
+                          error: data.error 
+                        };
+                      } catch (err) {
+                        return { 
+                          platform: post.account?.platform || 'Unknown', 
+                          success: false, 
+                          error: "Network error" 
+                        };
+                      }
+                    })
+                  );
 
-                  const publishData = await publishResponse.json();
-                  if (publishData.success) {
-                    toast.success("Post published to Twitter!");
+                  const successes = results.filter((r: any) => r.success);
+                  const failures = results.filter((r: any) => !r.success);
+
+                  if (successes.length > 0) {
+                    const platforms = successes.map((r: any) => r.platform).join(", ");
+                    toast.success(`Published to: ${platforms}`);
+                  }
+
+                  if (failures.length > 0) {
+                    failures.forEach((f: any) => {
+                      toast.error(`Failed to publish to ${f.platform}: ${f.error}`);
+                    });
+                  }
+
+                  if (successes.length > 0) {
                     resetForm();
                     onSuccess();
                     onClose();
-                  } else {
-                    toast.error(publishData.error || "Failed to publish post");
                   }
                 } catch (error) {
                   console.error("Error publishing post:", error);
-                  toast.error("An error occurred");
+                  toast.error("An error occurred during publishing");
                 } finally {
                   setIsSubmitting(false);
                 }
