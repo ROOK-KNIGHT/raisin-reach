@@ -227,6 +227,71 @@ export default function CreatePostModal({ isOpen, onClose, onSuccess }: CreatePo
           >
             Cancel
           </button>
+          {!isScheduled && (
+            <button
+              onClick={async (e) => {
+                e.preventDefault();
+                if (selectedAccountIds.length === 0) {
+                  toast.error("Please select at least one account");
+                  return;
+                }
+                if (!content.trim()) {
+                  toast.error("Please enter post content");
+                  return;
+                }
+                
+                setIsSubmitting(true);
+                try {
+                  // Create the post first
+                  const createResponse = await fetch("/api/portal/social-media/posts", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      accountIds: selectedAccountIds,
+                      content,
+                      mediaUrls,
+                      scheduledFor: null,
+                      status: "DRAFT",
+                    }),
+                  });
+
+                  const createData = await createResponse.json();
+                  if (!createData.success) {
+                    toast.error(createData.error || "Failed to create post");
+                    return;
+                  }
+
+                  // Publish immediately
+                  const publishResponse = await fetch("/api/portal/social-media/publish", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      postId: createData.data[0].id, // Use first created post
+                    }),
+                  });
+
+                  const publishData = await publishResponse.json();
+                  if (publishData.success) {
+                    toast.success("Post published to Twitter!");
+                    resetForm();
+                    onSuccess();
+                    onClose();
+                  } else {
+                    toast.error(publishData.error || "Failed to publish post");
+                  }
+                } catch (error) {
+                  console.error("Error publishing post:", error);
+                  toast.error("An error occurred");
+                } finally {
+                  setIsSubmitting(false);
+                }
+              }}
+              disabled={isSubmitting || accounts.length === 0}
+              className="bg-brand-plum text-brand-bone px-8 py-3 font-mono font-bold uppercase tracking-widest hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[4px_4px_0px_0px_var(--color-brand-gold)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_var(--color-brand-gold)]"
+            >
+              {isSubmitting ? "Publishing..." : "Publish Now"}
+            </button>
+          )}
           <button
             onClick={handleSubmit}
             disabled={isSubmitting || accounts.length === 0}
