@@ -51,6 +51,9 @@ model User {
   twoFactorEnabled  Boolean   @default(false)
   twoFactorSecret   String?
   
+  // Role & Permissions
+  role              UserRole  @default(CLIENT)
+  
   // Client-specific fields
   company           String?
   industry          String?
@@ -74,10 +77,14 @@ model User {
   socialMediaAccounts SocialMediaAccount[]
   socialPosts         SocialPost[]
   
+  // Admin invites sent
+  sentInvites       AdminInvite[] @relation("InvitedBy")
+  
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
   @@index([email])
+  @@index([role])
 }
 
 model VerificationToken {
@@ -86,6 +93,23 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// Admin Invite Model
+model AdminInvite {
+  id          String   @id @default(cuid())
+  email       String
+  role        UserRole
+  token       String   @unique
+  invitedById String
+  invitedBy   User     @relation("InvitedBy", fields: [invitedById], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  createdAt   DateTime @default(now())
+  
+  @@index([email])
+  @@index([token])
+  @@index([invitedById])
 }
 
 // Client Portal Models
@@ -175,6 +199,13 @@ model FocusArea {
 }
 
 // Enums
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  MANAGER
+  CLIENT
+}
+
 enum MembershipStatus {
   ACTIVE
   CANCELLED

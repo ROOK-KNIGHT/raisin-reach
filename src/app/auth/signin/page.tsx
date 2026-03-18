@@ -11,6 +11,7 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isAdminLogin, setIsAdminLogin] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +28,8 @@ export default function SignIn() {
       if (result?.error) {
         setError("Invalid email or password");
       } else {
-        router.push("/portal");
+        // Redirect based on login type
+        router.push(isAdminLogin ? "/admin" : "/portal");
       }
     } catch (error) {
       setError("Something went wrong");
@@ -55,8 +57,34 @@ export default function SignIn() {
 
         {/* Sign In Card */}
         <div className="bg-white border-2 border-brand-plum p-8 shadow-[8px_8px_0px_0px_var(--color-brand-plum)]">
+          {/* Login Type Toggle */}
+          <div className="mb-6 flex gap-2 p-1 bg-brand-bone border-2 border-brand-plum/20">
+            <button
+              type="button"
+              onClick={() => setIsAdminLogin(false)}
+              className={`flex-1 py-2 px-4 font-mono text-sm uppercase tracking-widest transition-all ${
+                !isAdminLogin
+                  ? "bg-brand-plum text-brand-bone font-bold"
+                  : "text-brand-charcoal/60 hover:text-brand-plum"
+              }`}
+            >
+              Client Login
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsAdminLogin(true)}
+              className={`flex-1 py-2 px-4 font-mono text-sm uppercase tracking-widest transition-all ${
+                isAdminLogin
+                  ? "bg-brand-plum text-brand-bone font-bold"
+                  : "text-brand-charcoal/60 hover:text-brand-plum"
+              }`}
+            >
+              Admin Login
+            </button>
+          </div>
+
           <h1 className="text-3xl font-display font-bold text-brand-plum mb-6 uppercase text-center">
-            Sign In
+            {isAdminLogin ? "Admin Sign In" : "Client Sign In"}
           </h1>
 
           {error && (
@@ -65,11 +93,13 @@ export default function SignIn() {
             </div>
           )}
 
-          {/* Google Sign In */}
-          <button
-            onClick={handleGoogleSignIn}
-            className="w-full mb-6 px-6 py-3 bg-white border-2 border-brand-charcoal text-brand-charcoal font-bold uppercase tracking-widest hover:bg-brand-charcoal hover:text-white transition-all duration-300 flex items-center justify-center gap-3"
-          >
+          {/* Google Sign In - Only for Client Login */}
+          {!isAdminLogin && (
+            <>
+              <button
+                onClick={handleGoogleSignIn}
+                className="w-full mb-6 px-6 py-3 bg-white border-2 border-brand-charcoal text-brand-charcoal font-bold uppercase tracking-widest hover:bg-brand-charcoal hover:text-white transition-all duration-300 flex items-center justify-center gap-3"
+              >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -88,19 +118,21 @@ export default function SignIn() {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            Continue with Google
-          </button>
+                Continue with Google
+              </button>
 
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-brand-plum/20"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-brand-charcoal/60 font-mono uppercase tracking-widest">
-                Or
-              </span>
-            </div>
-          </div>
+              <div className="relative mb-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-brand-plum/20"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-white text-brand-charcoal/60 font-mono uppercase tracking-widest">
+                    Or
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Email/Password Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -145,15 +177,17 @@ export default function SignIn() {
             </button>
           </form>
 
-          {/* Links */}
-          <div className="mt-6 text-center space-y-2">
-            <p className="text-sm text-brand-charcoal/60">
-              Don't have an account?{" "}
-              <Link href="/auth/signup" className="text-brand-plum font-bold hover:text-brand-gold transition-colors">
-                Sign up
-              </Link>
-            </p>
-          </div>
+          {/* Links - Only for Client Login */}
+          {!isAdminLogin && (
+            <div className="mt-6 text-center space-y-2">
+              <p className="text-sm text-brand-charcoal/60">
+                Don't have an account?{" "}
+                <Link href="/auth/signup" className="text-brand-plum font-bold hover:text-brand-gold transition-colors">
+                  Sign up
+                </Link>
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Back to Home */}
