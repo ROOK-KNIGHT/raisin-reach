@@ -229,6 +229,30 @@ export default function SettingsPage() {
     }
   };
 
+  // Handle account deletion
+  const handleDeleteAccount = async () => {
+    try {
+      const response = await fetch("/api/portal/profile", {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success("Account deleted successfully. Redirecting...");
+        // Sign out and redirect to home
+        setTimeout(() => {
+          window.location.href = "/api/auth/signout";
+        }, 2000);
+      } else {
+        toast.error(data.error || "Failed to delete account");
+      }
+    } catch (error) {
+      console.error("Account deletion error:", error);
+      toast.error("An error occurred while deleting your account");
+    }
+  };
+
   // Handle 2FA disable
   const handleDisable2FA = async () => {
     if (!confirm("Are you sure you want to disable two-factor authentication?")) {
@@ -393,6 +417,16 @@ export default function SettingsPage() {
                 }`}
               >
                 Security
+              </button>
+              <button
+                onClick={() => setActiveTab("danger")}
+                className={`w-full text-left px-4 py-3 font-mono text-sm uppercase tracking-widest transition-all ${
+                  activeTab === "danger"
+                    ? "bg-red-500 text-white"
+                    : "text-red-500 hover:bg-red-50"
+                }`}
+              >
+                Danger Zone
               </button>
             </div>
           </div>
@@ -585,6 +619,50 @@ export default function SettingsPage() {
                     </button>
                     <button className="px-8 py-3 border-2 border-brand-plum text-brand-plum font-mono text-sm uppercase tracking-widest hover:bg-brand-plum hover:text-brand-bone transition-all">
                       View Invoices
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Danger Zone Tab */}
+            {activeTab === "danger" && (
+              <div className="bg-white border-2 border-red-500 p-8 shadow-[2px_2px_0px_0px_rgba(239,68,68,1)]">
+                <h3 className="text-2xl font-display font-bold text-red-500 uppercase mb-6">Danger Zone</h3>
+                <div className="space-y-6">
+                  <div className="p-6 bg-red-50 border-2 border-red-200">
+                    <h4 className="font-bold text-red-700 mb-2">Delete Account</h4>
+                    <p className="text-red-600 mb-4">
+                      Once you delete your account, there is no going back. This action will:
+                    </p>
+                    <ul className="list-disc list-inside text-red-600 mb-4 space-y-1">
+                      <li>Permanently delete your account and all associated data</li>
+                      <li>Remove all your leads and call logs</li>
+                      <li>Cancel your subscription immediately</li>
+                      <li>Delete all your focus areas and preferences</li>
+                    </ul>
+                    <p className="text-sm text-red-500 font-bold mb-4">
+                      ⚠️ This action cannot be undone!
+                    </p>
+                    <button
+                      onClick={() => {
+                        const confirmed = window.confirm(
+                          "Are you absolutely sure you want to delete your account? This action cannot be undone.\n\nType 'DELETE' in the next prompt to confirm."
+                        );
+                        if (confirmed) {
+                          const verification = window.prompt(
+                            "Please type DELETE (in capital letters) to confirm account deletion:"
+                          );
+                          if (verification === "DELETE") {
+                            handleDeleteAccount();
+                          } else {
+                            toast.error("Account deletion cancelled - verification failed");
+                          }
+                        }
+                      }}
+                      className="px-8 py-3 bg-red-500 text-white font-mono text-sm uppercase tracking-widest font-bold hover:bg-red-600 transition-all"
+                    >
+                      Delete My Account
                     </button>
                   </div>
                 </div>

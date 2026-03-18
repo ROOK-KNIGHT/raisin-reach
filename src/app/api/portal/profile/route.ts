@@ -70,3 +70,57 @@ export async function PUT(request: NextRequest) {
     );
   }
 }
+
+export async function DELETE() {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = session.user as any;
+
+    // Prevent admin users from deleting their accounts through this endpoint
+    if (["SUPER_ADMIN", "ADMIN", "MANAGER"].includes(user.role)) {
+      return NextResponse.json(
+        { error: "Admin accounts cannot be deleted through this endpoint" },
+        { status: 403 }
+      );
+    }
+
+    // Delete all user data
+    await prisma.$transaction([
+      // Delete user's leads
+      prisma.lead.deleteMany({
+        where: { userId: user.id },
+      }),
+      // Delete user's call logs
+      prisma.callLog.deleteMany({
+        where: { userId: user.id },
+      }),
+      // Delete user's focus areas
+      prisma.focusArea.deleteMany({
+        where: { userId: user.id },
+      }),
+      // Delete user's notification preferences
+      prisma.notificationPreferences.deleteMany({
+        where: { userId: user.id },
+      }),
+      // Finally, delete the user
+      prisma.user.delete({
+        where: { id: user.id },
+      }),
+    ]);
+
+    return NextResponse.json({
+      message: "Account deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    return NextResponse.json(
+      { error: "Failed to delete account" },
+      { status: 500 }
+    );
+  }
+}
