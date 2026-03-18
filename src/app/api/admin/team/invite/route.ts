@@ -3,6 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
   try {
@@ -84,10 +87,65 @@ export async function POST(request: Request) {
       },
     });
 
-    // TODO: Send invitation email with link containing token
-    // For now, we'll just return the invite
-    // In production, you'd send an email with a link like:
-    // https://raisinreach.com/auth/accept-invite?token=${token}
+    // Send invitation email
+    const inviteUrl = `${process.env.NEXTAUTH_URL || 'https://raisinreach.com'}/auth/accept-invite?token=${token}`;
+    
+    try {
+      await resend.emails.send({
+        from: 'RaisinReach Admin <onboarding@raisinreach.com>',
+        to: email,
+        subject: 'You\'ve been invited to join the RaisinReach Admin Team',
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: #4A1D4A; color: #F4E5D3; padding: 30px; text-align: center; }
+                .content { background: #fff; padding: 30px; border: 2px solid #4A1D4A; }
+                .button { display: inline-block; padding: 15px 30px; background: #D4AF37; color: #4A1D4A; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin: 20px 0; }
+                .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+                .role-badge { display: inline-block; padding: 5px 15px; background: #D4AF37; color: #4A1D4A; font-weight: bold; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1 style="margin: 0; font-size: 32px;">RAISIN REACH</h1>
+                  <p style="margin: 10px 0 0 0; opacity: 0.9;">Admin Team Invitation</p>
+                </div>
+                <div class="content">
+                  <h2 style="color: #4A1D4A;">You've Been Invited!</h2>
+                  <p>You've been invited to join the RaisinReach admin team with the role of:</p>
+                  <p style="text-align: center;">
+                    <span class="role-badge">${role}</span>
+                  </p>
+                  <p>Click the button below to accept your invitation and set up your account:</p>
+                  <p style="text-align: center;">
+                    <a href="${inviteUrl}" class="button">Accept Invitation</a>
+                  </p>
+                  <p style="font-size: 14px; color: #666;">
+                    Or copy and paste this link into your browser:<br>
+                    <a href="${inviteUrl}" style="color: #4A1D4A; word-break: break-all;">${inviteUrl}</a>
+                  </p>
+                  <p style="font-size: 14px; color: #666; margin-top: 30px;">
+                    <strong>Note:</strong> This invitation will expire in 7 days.
+                  </p>
+                </div>
+                <div class="footer">
+                  <p>© ${new Date().getFullYear()} RaisinReach. All rights reserved.</p>
+                  <p>If you didn't expect this invitation, you can safely ignore this email.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      });
+    } catch (emailError) {
+      console.error("Error sending invitation email:", emailError);
+      // Don't fail the request if email fails - invitation is still created
+    }
 
     return NextResponse.json(
       {
