@@ -3,42 +3,56 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+interface Stats {
+  totalClients: number;
+  activeClients: number;
+  totalLeads: number;
+  callsThisWeek: number;
+}
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const user = session?.user as any || { name: "Admin User" };
 
-  // Mock admin stats
-  const stats = {
-    totalClients: 12,
-    activeClients: 10,
-    totalLeads: 47,
-    callsThisWeek: 156,
+  const [stats, setStats] = useState<Stats>({
+    totalClients: 0,
+    activeClients: 0,
+    totalLeads: 0,
+    callsThisWeek: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetchStats();
+    }
+  }, [status]);
+
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/admin/stats");
+      if (res.ok) {
+        const data = await res.json();
+        setStats(data);
+      }
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const recentActivity = [
     {
       id: 1,
       type: "lead_added",
-      client: "John Smith (Acme Corp)",
-      action: "New lead added: Global Manufacturing",
-      timestamp: "10 minutes ago",
-    },
-    {
-      id: 2,
-      type: "call_logged",
-      client: "Sarah Johnson (Tech Solutions)",
-      action: "Call logged: Connected with Mike Davis",
-      timestamp: "1 hour ago",
-    },
-    {
-      id: 3,
-      type: "client_signup",
-      client: "New Client",
-      action: "Robert Williams signed up",
-      timestamp: "3 hours ago",
+      client: "Recent Activity",
+      action: "Dashboard stats now pulling from real database",
+      timestamp: "Just now",
     },
   ];
 
@@ -56,7 +70,7 @@ export default function AdminDashboard() {
             </div>
             <div className="flex items-center gap-4">
               <span className="px-4 py-2 bg-brand-gold text-brand-plum font-mono text-sm uppercase tracking-widest font-bold">
-                ADMIN
+                {user.role === "SUPER_ADMIN" ? "SUPER ADMIN" : user.role || "ADMIN"}
               </span>
               <Link
                 href="/api/auth/signout"
@@ -103,6 +117,14 @@ export default function AdminDashboard() {
             >
               Reports
             </Link>
+            {user.role === "SUPER_ADMIN" && (
+              <Link
+                href="/admin/team"
+                className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
+              >
+                Team
+              </Link>
+            )}
           </div>
         </div>
       </nav>
@@ -110,27 +132,34 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Stats Grid */}
-        <div className="grid md:grid-cols-4 gap-6 mb-12">
-          <div className="bg-white border-2 border-brand-plum p-6 shadow-[4px_4px_0px_0px_var(--color-brand-plum)]">
-            <div className="text-5xl font-display font-bold text-brand-plum mb-2">{stats.totalClients}</div>
-            <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60">Total Clients</div>
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 border-4 border-brand-plum border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-brand-plum font-mono uppercase tracking-widest">Loading stats...</p>
           </div>
+        ) : (
+          <div className="grid md:grid-cols-4 gap-6 mb-12">
+            <div className="bg-white border-2 border-brand-plum p-6 shadow-[4px_4px_0px_0px_var(--color-brand-plum)]">
+              <div className="text-5xl font-display font-bold text-brand-plum mb-2">{stats.totalClients}</div>
+              <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60">Total Clients</div>
+            </div>
 
-          <div className="bg-white border-2 border-brand-plum p-6 shadow-[4px_4px_0px_0px_var(--color-brand-plum)]">
-            <div className="text-5xl font-display font-bold text-green-600 mb-2">{stats.activeClients}</div>
-            <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60">Active Clients</div>
-          </div>
+            <div className="bg-white border-2 border-brand-plum p-6 shadow-[4px_4px_0px_0px_var(--color-brand-plum)]">
+              <div className="text-5xl font-display font-bold text-green-600 mb-2">{stats.activeClients}</div>
+              <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60">Active Clients</div>
+            </div>
 
-          <div className="bg-white border-2 border-brand-plum p-6 shadow-[4px_4px_0px_0px_var(--color-brand-plum)]">
-            <div className="text-5xl font-display font-bold text-brand-gold mb-2">{stats.totalLeads}</div>
-            <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60">Total Leads</div>
-          </div>
+            <div className="bg-white border-2 border-brand-plum p-6 shadow-[4px_4px_0px_0px_var(--color-brand-plum)]">
+              <div className="text-5xl font-display font-bold text-brand-gold mb-2">{stats.totalLeads}</div>
+              <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60">Total Leads</div>
+            </div>
 
-          <div className="bg-white border-2 border-brand-plum p-6 shadow-[4px_4px_0px_0px_var(--color-brand-plum)]">
-            <div className="text-5xl font-display font-bold text-brand-plum mb-2">{stats.callsThisWeek}</div>
-            <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60">Calls This Week</div>
+            <div className="bg-white border-2 border-brand-plum p-6 shadow-[4px_4px_0px_0px_var(--color-brand-plum)]">
+              <div className="text-5xl font-display font-bold text-brand-plum mb-2">{stats.callsThisWeek}</div>
+              <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60">Calls This Week</div>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Quick Actions */}
         <div className="bg-white border-2 border-brand-plum p-6 mb-8">
