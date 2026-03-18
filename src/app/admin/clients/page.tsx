@@ -2,85 +2,77 @@
 
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
+
+interface Client {
+  id: string;
+  name: string | null;
+  email: string;
+  company: string | null;
+  industry: string | null;
+  membershipStatus: string;
+  membershipTier: string | null;
+  joinedAt: string;
+  _count: {
+    leads: number;
+    callLogs: number;
+  };
+}
 
 export default function AdminClientsPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const user = session?.user as any || { name: "Admin User" };
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock clients data
-  const clients = [
-    {
-      id: 1,
-      name: "John Smith",
-      company: "Acme Corp",
-      email: "john@acmecorp.com",
-      phone: "(555) 123-4567",
-      status: "active",
-      membershipPlan: "Professional",
-      joinDate: "Jan 15, 2026",
-      totalLeads: 12,
-      totalCalls: 47,
-      lastActivity: "2 hours ago",
-    },
-    {
-      id: 2,
-      name: "Sarah Johnson",
-      company: "Tech Solutions Inc",
-      email: "sarah@techsolutions.com",
-      phone: "(555) 234-5678",
-      status: "active",
-      membershipPlan: "Enterprise",
-      joinDate: "Dec 10, 2025",
-      totalLeads: 18,
-      totalCalls: 62,
-      lastActivity: "1 day ago",
-    },
-    {
-      id: 3,
-      name: "Mike Davis",
-      company: "Global Manufacturing",
-      email: "mike@globalmanuf.com",
-      phone: "(555) 345-6789",
-      status: "active",
-      membershipPlan: "Professional",
-      joinDate: "Nov 5, 2025",
-      totalLeads: 8,
-      totalCalls: 31,
-      lastActivity: "3 hours ago",
-    },
-    {
-      id: 4,
-      name: "Lisa Chen",
-      company: "Enterprise Solutions LLC",
-      email: "lisa@enterprisesol.com",
-      phone: "(555) 456-7890",
-      status: "trial",
-      membershipPlan: "Trial",
-      joinDate: "Feb 10, 2026",
-      totalLeads: 3,
-      totalCalls: 8,
-      lastActivity: "5 hours ago",
-    },
-    {
-      id: 5,
-      name: "Robert Williams",
-      company: "Startup Ventures",
-      email: "robert@startupventures.io",
-      phone: "(555) 567-8901",
-      status: "paused",
-      membershipPlan: "Professional",
-      joinDate: "Oct 20, 2025",
-      totalLeads: 5,
-      totalCalls: 15,
-      lastActivity: "2 weeks ago",
-    },
-  ];
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetchClients();
+    }
+  }, [status]);
 
-  const filteredClients = clients.filter((client) => {
+  const fetchClients = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/admin/clients");
+      if (res.ok) {
+        const data = await res.json();
+        setClients(data.clients || []);
+      } else {
+        toast.error("Failed to load clients");
+      }
+    } catch (error) {
+      console.error("Error fetching clients:", error);
+      toast.error("Failed to load clients");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Transform clients data for display
+  const displayClients = clients.map((client) => ({
+    id: client.id,
+    name: client.name || "No Name",
+    company: client.company || "No Company",
+    email: client.email,
+    phone: "N/A",
+    status: client.membershipStatus.toLowerCase(),
+    membershipPlan: client.membershipTier || "standard",
+    joinDate: new Date(client.joinedAt).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }),
+    totalLeads: client._count.leads,
+    totalCalls: client._count.callLogs,
+    lastActivity: "N/A",
+  }));
+
+  const filteredClients = displayClients.filter((client) => {
     const matchesStatus = filterStatus === "all" || client.status === filterStatus;
     const matchesSearch =
       client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -159,6 +151,14 @@ export default function AdminClientsPage() {
             >
               Reports
             </Link>
+            {user.role === "SUPER_ADMIN" && (
+              <Link
+                href="/admin/team"
+                className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
+              >
+                Team
+              </Link>
+            )}
           </div>
         </div>
       </nav>
@@ -168,6 +168,16 @@ export default function AdminClientsPage() {
         <div className="mb-8">
           <h2 className="text-4xl font-display font-bold text-brand-plum uppercase mb-2">Client Management</h2>
           <p className="text-brand-charcoal/60">View and manage all client accounts</p>
+        </div>
+
+        {/* Add Client Button */}
+        <div className="mb-8 flex justify-end">
+          <Link
+            href="/admin/clients/new"
+            className="px-6 py-3 bg-brand-gold text-brand-plum font-mono text-sm uppercase tracking-widest font-bold hover:bg-brand-plum hover:text-brand-gold border-2 border-brand-plum transition-all"
+          >
+            + Add New Client
+          </Link>
         </div>
 
         {/* Filters */}
@@ -207,8 +217,14 @@ export default function AdminClientsPage() {
         </div>
 
         {/* Clients List */}
-        <div className="space-y-4">
-          {filteredClients.map((client) => (
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 border-4 border-brand-plum border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-brand-plum font-mono uppercase tracking-widest">Loading clients...</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredClients.map((client) => (
             <div
               key={client.id}
               className="bg-white border-2 border-brand-plum p-6 shadow-[2px_2px_0px_0px_var(--color-brand-plum)]"
@@ -271,11 +287,12 @@ export default function AdminClientsPage() {
                   <div className="font-bold text-brand-charcoal">{client.lastActivity}</div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
+        )}
 
-        {filteredClients.length === 0 && (
+        {!loading && filteredClients.length === 0 && (
           <div className="bg-white border-2 border-brand-plum p-12 text-center">
             <p className="text-brand-charcoal/60 font-mono uppercase tracking-widest">
               No clients found matching your filters
