@@ -2,108 +2,121 @@
 
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+interface Lead {
+  id: string;
+  companyName: string;
+  contactName: string;
+  contactTitle: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  status: string;
+  source: string | null;
+  industry: string | null;
+  budget: string | null;
+  timeline: string | null;
+  nextAction: string | null;
+  nextActionDate: string | null;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string | null;
+    email: string;
+    company: string | null;
+  };
+}
 
 export default function AdminLeadsPage() {
   const { data: session } = useSession();
   const user = session?.user as any || { name: "Admin User" };
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterStage, setFilterStage] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
   const [filterClient, setFilterClient] = useState("all");
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [clients, setClients] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock leads data
-  const leads = [
-    {
-      id: 1,
-      company: "Global Manufacturing",
-      contact: "Mike Davis",
-      title: "VP of Operations",
-      email: "mike.davis@globalmanuf.com",
-      phone: "(555) 345-6789",
-      client: "John Smith (Acme Corp)",
-      clientId: 1,
-      stage: "qualified",
-      score: 95,
-      budget: "$50,000+",
-      timeline: "Q1 2026",
-      lastContact: "1 day ago",
-      nextAction: "Send proposal",
-    },
-    {
-      id: 2,
-      company: "Enterprise Solutions LLC",
-      contact: "Lisa Chen",
-      title: "CTO",
-      email: "lisa.chen@enterprisesol.com",
-      phone: "(555) 456-7890",
-      client: "Sarah Johnson (Tech Solutions)",
-      clientId: 2,
-      stage: "qualified",
-      score: 98,
-      budget: "$75,000+",
-      timeline: "Immediate",
-      lastContact: "1 day ago",
-      nextAction: "Schedule demo",
-    },
-    {
-      id: 3,
-      company: "Tech Innovations Inc",
-      contact: "James Wilson",
-      title: "Director of Sales",
-      email: "james.w@techinnovations.com",
-      phone: "(555) 789-0123",
-      client: "John Smith (Acme Corp)",
-      clientId: 1,
-      stage: "contacted",
-      score: 72,
-      budget: "$30,000+",
-      timeline: "Q2 2026",
-      lastContact: "3 days ago",
-      nextAction: "Follow-up call",
-    },
-    {
-      id: 4,
-      company: "Digital Marketing Co",
-      contact: "Amanda Rodriguez",
-      title: "Marketing Manager",
-      email: "amanda@digitalmarketing.co",
-      phone: "(555) 890-1234",
-      client: "Mike Davis (Global Manufacturing)",
-      clientId: 3,
-      stage: "nurture",
-      score: 45,
-      budget: "$20,000+",
-      timeline: "Q3 2026",
-      lastContact: "1 week ago",
-      nextAction: "Send resources",
-    },
-  ];
+  // Fetch leads and clients
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [leadsRes, clientsRes] = await Promise.all([
+          fetch("/api/admin/leads"),
+          fetch("/api/admin/clients"),
+        ]);
+
+        if (leadsRes.ok) {
+          const leadsData = await leadsRes.json();
+          setLeads(leadsData.leads || []);
+        }
+
+        if (clientsRes.ok) {
+          const clientsData = await clientsRes.json();
+          setClients(clientsData.clients || []);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const filteredLeads = leads.filter((lead) => {
-    const matchesStage = filterStage === "all" || lead.stage === filterStage;
-    const matchesClient = filterClient === "all" || lead.clientId.toString() === filterClient;
+    const matchesStatus = filterStatus === "all" || lead.status === filterStatus;
+    const matchesClient = filterClient === "all" || lead.user.id === filterClient;
     const matchesSearch =
-      lead.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lead.contact.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lead.client.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesStage && matchesClient && matchesSearch;
+      lead.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lead.contactName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (lead.user.name && lead.user.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesStatus && matchesClient && matchesSearch;
   });
 
-  const getStageBadge = (stage: string) => {
-    const badges = {
-      qualified: "bg-brand-gold text-brand-plum",
-      contacted: "bg-blue-100 text-blue-700",
-      nurture: "bg-purple-100 text-purple-700",
+  const getStatusBadge = (status: string) => {
+    const badges: Record<string, string> = {
+      'NEW': 'bg-blue-100 text-blue-700',
+      'CONTACTED': 'bg-purple-100 text-purple-700',
+      'QUALIFIED': 'bg-brand-gold text-brand-plum',
+      'MEETING_SCHEDULED': 'bg-green-100 text-green-700',
+      'PROPOSAL_SENT': 'bg-yellow-100 text-yellow-700',
+      'NEGOTIATION': 'bg-orange-100 text-orange-700',
+      'WON': 'bg-green-500 text-white',
+      'LOST': 'bg-red-100 text-red-700',
+      'NURTURE': 'bg-indigo-100 text-indigo-700',
     };
-    return badges[stage as keyof typeof badges] || "bg-gray-100 text-gray-700";
+    return badges[status] || 'bg-gray-100 text-gray-700';
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600";
-    if (score >= 60) return "text-yellow-600";
-    return "text-red-600";
+  const formatStatus = (status: string) => {
+    return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString();
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-brand-bone flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-brand-plum border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-brand-plum font-mono uppercase tracking-widest">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-brand-bone">
@@ -119,7 +132,7 @@ export default function AdminLeadsPage() {
             </div>
             <div className="flex items-center gap-4">
               <span className="px-4 py-2 bg-brand-gold text-brand-plum font-mono text-sm uppercase tracking-widest font-bold">
-                ADMIN
+                {user?.role === "SUPER_ADMIN" ? "SUPER ADMIN" : user?.role || "ADMIN"}
               </span>
               <Link
                 href="/api/auth/signout"
@@ -166,6 +179,14 @@ export default function AdminLeadsPage() {
             >
               Reports
             </Link>
+            {user?.role === "SUPER_ADMIN" && (
+              <Link
+                href="/admin/team"
+                className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
+              >
+                Team
+              </Link>
+            )}
           </div>
         </div>
       </nav>
@@ -202,20 +223,26 @@ export default function AdminLeadsPage() {
               />
             </div>
 
-            {/* Stage Filter */}
+            {/* Status Filter */}
             <div>
               <label className="block text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
-                Filter by Stage
+                Filter by Status
               </label>
               <select
-                value={filterStage}
-                onChange={(e) => setFilterStage(e.target.value)}
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
                 className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
               >
-                <option value="all">All Stages</option>
-                <option value="qualified">Qualified</option>
-                <option value="contacted">Contacted</option>
-                <option value="nurture">Nurture</option>
+                <option value="all">All Statuses</option>
+                <option value="NEW">New</option>
+                <option value="CONTACTED">Contacted</option>
+                <option value="QUALIFIED">Qualified</option>
+                <option value="MEETING_SCHEDULED">Meeting Scheduled</option>
+                <option value="PROPOSAL_SENT">Proposal Sent</option>
+                <option value="NEGOTIATION">Negotiation</option>
+                <option value="WON">Won</option>
+                <option value="LOST">Lost</option>
+                <option value="NURTURE">Nurture</option>
               </select>
             </div>
 
@@ -230,9 +257,11 @@ export default function AdminLeadsPage() {
                 className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
               >
                 <option value="all">All Clients</option>
-                <option value="1">John Smith (Acme Corp)</option>
-                <option value="2">Sarah Johnson (Tech Solutions)</option>
-                <option value="3">Mike Davis (Global Manufacturing)</option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.name} - {client.company}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -248,27 +277,22 @@ export default function AdminLeadsPage() {
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-2xl font-display font-bold text-brand-plum">{lead.company}</h3>
-                    <span className={`px-3 py-1 text-xs font-mono uppercase font-bold ${getStageBadge(lead.stage)}`}>
-                      {lead.stage}
+                    <h3 className="text-2xl font-display font-bold text-brand-plum">{lead.companyName}</h3>
+                    <span className={`px-3 py-1 text-xs font-mono uppercase font-bold ${getStatusBadge(lead.status)}`}>
+                      {formatStatus(lead.status)}
                     </span>
                   </div>
                   <div className="text-brand-charcoal/80 mb-1">
-                    <strong>{lead.contact}</strong> • {lead.title}
+                    <strong>{lead.contactName}</strong>
+                    {lead.contactTitle && ` • ${lead.contactTitle}`}
                   </div>
                   <div className="text-sm text-brand-charcoal/60 mb-2">
-                    {lead.email} • {lead.phone}
+                    {lead.contactEmail && `${lead.contactEmail}`}
+                    {lead.contactPhone && ` • ${lead.contactPhone}`}
                   </div>
                   <div className="text-sm text-brand-charcoal/60">
-                    <span className="font-bold">Client:</span> {lead.client}
-                  </div>
-                </div>
-                <div className="text-center mr-6">
-                  <div className={`text-4xl font-display font-bold ${getScoreColor(lead.score)}`}>
-                    {lead.score}
-                  </div>
-                  <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60">
-                    Score
+                    <span className="font-bold">Client:</span> {lead.user.name || lead.user.email}
+                    {lead.user.company && ` (${lead.user.company})`}
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -283,40 +307,54 @@ export default function AdminLeadsPage() {
 
               {/* Lead Info */}
               <div className="grid md:grid-cols-4 gap-4 p-4 bg-brand-bone border-l-4 border-brand-gold">
+                {lead.budget && (
+                  <div>
+                    <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
+                      Budget
+                    </div>
+                    <div className="font-bold text-brand-plum">{lead.budget}</div>
+                  </div>
+                )}
+                {lead.timeline && (
+                  <div>
+                    <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
+                      Timeline
+                    </div>
+                    <div className="font-bold text-brand-plum">{lead.timeline}</div>
+                  </div>
+                )}
                 <div>
                   <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
-                    Budget
+                    Created
                   </div>
-                  <div className="font-bold text-brand-plum">{lead.budget}</div>
+                  <div className="font-bold text-brand-charcoal">{formatDate(lead.createdAt)}</div>
                 </div>
-                <div>
-                  <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
-                    Timeline
+                {lead.nextAction && (
+                  <div>
+                    <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
+                      Next Action
+                    </div>
+                    <div className="font-bold text-brand-charcoal">{lead.nextAction}</div>
                   </div>
-                  <div className="font-bold text-brand-plum">{lead.timeline}</div>
-                </div>
-                <div>
-                  <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
-                    Last Contact
-                  </div>
-                  <div className="font-bold text-brand-charcoal">{lead.lastContact}</div>
-                </div>
-                <div>
-                  <div className="text-xs font-mono uppercase tracking-widest text-brand-charcoal/60 mb-1">
-                    Next Action
-                  </div>
-                  <div className="font-bold text-brand-charcoal">{lead.nextAction}</div>
-                </div>
+                )}
               </div>
             </div>
           ))}
         </div>
 
-        {filteredLeads.length === 0 && (
+        {filteredLeads.length === 0 && !loading && (
           <div className="bg-white border-2 border-brand-plum p-12 text-center">
-            <p className="text-brand-charcoal/60 font-mono uppercase tracking-widest">
-              No leads found matching your filters
+            <p className="text-brand-charcoal/60 font-mono uppercase tracking-widest mb-4">
+              {leads.length === 0 ? "No leads yet" : "No leads found matching your filters"}
             </p>
+            {leads.length === 0 && (
+              <Link
+                href="/admin/leads/new"
+                className="inline-block px-6 py-3 bg-brand-plum text-brand-gold font-mono text-sm uppercase tracking-widest hover:bg-brand-gold hover:text-brand-plum border-2 border-brand-plum transition-all"
+              >
+                Add Your First Lead
+              </Link>
+            )}
           </div>
         )}
       </div>
