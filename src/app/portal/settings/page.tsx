@@ -2,10 +2,10 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import TwoFactorModal from "@/components/portal/TwoFactorModal";
+import PortalLayout from "@/components/portal/PortalLayout";
 
 export default function SettingsPage() {
   const { data: session, status } = useSession();
@@ -303,71 +303,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-brand-bone">
-      {/* Header */}
-      <header className="bg-brand-plum text-brand-bone border-b-4 border-brand-gold">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-display font-bold uppercase">Client Portal</h1>
-              <p className="mt-1 text-brand-bone/80 font-sans">
-                Welcome back, <strong>{user.name}</strong>
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="px-4 py-2 bg-brand-gold text-brand-plum font-mono text-sm uppercase tracking-widest font-bold">
-                ACTIVE
-              </span>
-              <Link
-                href="/api/auth/signout"
-                className="px-4 py-2 border-2 border-brand-bone text-brand-bone hover:bg-brand-bone hover:text-brand-plum transition-all font-mono text-sm uppercase tracking-widest"
-              >
-                Sign Out
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Navigation */}
-      <nav className="bg-white border-b-2 border-brand-plum/20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex gap-8">
-            <Link
-              href="/portal"
-              className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/portal/call-logs"
-              className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
-            >
-              Call Logs
-            </Link>
-            <Link
-              href="/portal/leads"
-              className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
-            >
-              Leads
-            </Link>
-            <Link
-              href="/portal/focus-areas"
-              className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
-            >
-              Focus Areas
-            </Link>
-            <Link
-              href="/portal/settings"
-              className="px-4 py-4 border-b-4 border-brand-plum text-brand-plum font-bold uppercase tracking-wider text-sm"
-            >
-              Settings
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
+    <PortalLayout>
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="mb-8">
           <h2 className="text-4xl font-display font-bold text-brand-plum uppercase mb-2">Account Settings</h2>
@@ -789,6 +725,6 @@ export default function SettingsPage() {
         onClose={() => setIs2FAModalOpen(false)}
         onSuccess={load2FAStatus}
       />
-    </main>
+    </PortalLayout>
   );
 }
