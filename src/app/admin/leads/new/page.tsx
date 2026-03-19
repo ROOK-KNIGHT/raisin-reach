@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function NewLeadPage() {
   const { data: session } = useSession();
@@ -12,6 +13,7 @@ export default function NewLeadPage() {
 
   const [clients, setClients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     // Client Selection
@@ -68,12 +70,45 @@ export default function NewLeadPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Submit to API
-    console.log("Form submitted:", formData);
-    alert("Lead created successfully!");
-    router.push("/admin/leads");
+    setSubmitting(true);
+
+    try {
+      const res = await fetch("/api/admin/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: formData.clientId,
+          companyName: formData.company,
+          contactName: formData.contactName,
+          contactTitle: formData.title,
+          contactEmail: formData.email,
+          contactPhone: formData.phone,
+          status: formData.stage.toUpperCase(),
+          source: formData.source || null,
+          industry: formData.industry || null,
+          budget: formData.budget || null,
+          authority: formData.authorityNotes || null,
+          need: formData.needNotes || null,
+          timeline: formData.timeline || null,
+          notes: formData.notes || null,
+        }),
+      });
+
+      if (res.ok) {
+        toast.success("Lead created successfully!");
+        router.push("/admin/leads");
+      } else {
+        const data = await res.json();
+        toast.error(data.error || "Failed to create lead");
+      }
+    } catch (error) {
+      console.error("Error creating lead:", error);
+      toast.error("Something went wrong");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -552,9 +587,10 @@ export default function NewLeadPage() {
           <div className="flex gap-4">
             <button
               type="submit"
-              className="px-8 py-4 bg-brand-gold text-brand-plum font-mono text-sm uppercase tracking-widest font-bold hover:bg-brand-plum hover:text-brand-gold border-2 border-brand-plum transition-all"
+              disabled={submitting}
+              className="px-8 py-4 bg-brand-gold text-brand-plum font-mono text-sm uppercase tracking-widest font-bold hover:bg-brand-plum hover:text-brand-gold border-2 border-brand-plum transition-all disabled:opacity-50"
             >
-              Create Lead
+              {submitting ? "Creating..." : "Create Lead"}
             </button>
             <Link
               href="/admin/leads"
