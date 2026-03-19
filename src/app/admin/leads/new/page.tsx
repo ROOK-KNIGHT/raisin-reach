@@ -82,9 +82,9 @@ export default function NewLeadPage() {
           userId: formData.clientId,
           companyName: formData.company,
           contactName: formData.contactName,
-          contactTitle: formData.title,
-          contactEmail: formData.email,
-          contactPhone: formData.phone,
+          contactTitle: formData.title || null,
+          contactEmail: formData.email || null,
+          contactPhone: formData.phone || null,
           status: formData.stage.toUpperCase(),
           source: formData.source || null,
           industry: formData.industry || null,
@@ -93,6 +93,8 @@ export default function NewLeadPage() {
           need: formData.needNotes || null,
           timeline: formData.timeline || null,
           notes: formData.notes || null,
+          nextAction: null,
+          nextActionDate: null,
         }),
       });
 
