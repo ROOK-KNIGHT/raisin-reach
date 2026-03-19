@@ -3,7 +3,6 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { toast } from "react-hot-toast";
 import { PostStatus, SocialPlatform } from "@prisma/client";
 
@@ -12,6 +11,7 @@ import SocialCalendar from "@/components/portal/social-media/SocialCalendar";
 import PostCard from "@/components/portal/social-media/PostCard";
 import ConnectAccountModal from "@/components/portal/social-media/ConnectAccountModal";
 import CreatePostModal from "@/components/portal/social-media/CreatePostModal";
+import PortalLayout from "@/components/portal/PortalLayout";
 
 type TabType = "dashboard" | "posts" | "calendar" | "accounts";
 
@@ -108,39 +108,11 @@ export default function SocialMediaPage() {
   }
 
   return (
-    <main className="min-h-screen bg-brand-bone">
-      {/* Header */}
-      <header className="bg-brand-plum text-brand-bone border-b-4 border-brand-gold">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-display font-bold uppercase">Social Media Manager</h1>
-              <p className="mt-1 text-brand-bone/80 font-sans">
-                Schedule, publish, and track your content
-              </p>
-            </div>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setShowConnectModal(true)}
-                className="px-4 py-2 border-2 border-brand-bone text-brand-bone hover:bg-brand-bone hover:text-brand-plum transition-all font-mono text-sm uppercase tracking-widest"
-              >
-                Connect Accounts
-              </button>
-              <Link
-                href="/portal"
-                className="px-4 py-2 border-2 border-brand-bone text-brand-bone hover:bg-brand-bone hover:text-brand-plum transition-all font-mono text-sm uppercase tracking-widest"
-              >
-                Back to Portal
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Tab Navigation */}
-      <nav className="bg-white border-b-2 border-brand-plum/20 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex gap-8 overflow-x-auto">
+    <PortalLayout>
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Tab Navigation */}
+        <div className="bg-white border-2 border-brand-plum mb-8">
+          <div className="flex gap-8 px-6 overflow-x-auto">
             {(["dashboard", "posts", "calendar", "accounts"] as TabType[]).map((tab) => (
               <button
                 key={tab}
@@ -156,10 +128,7 @@ export default function SocialMediaPage() {
             ))}
           </div>
         </div>
-      </nav>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Dashboard Tab */}
         {activeTab === "dashboard" && <AnalyticsDashboard />}
 
@@ -294,6 +263,6 @@ export default function SocialMediaPage() {
           fetchPosts(); // Refresh posts list
         }}
       />
-    </main>
+    </PortalLayout>
   );
 }

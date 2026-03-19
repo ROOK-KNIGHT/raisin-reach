@@ -3,13 +3,13 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { toast } from "react-hot-toast";
 import SummaryCard from "@/components/portal/profit-estimator/SummaryCard";
 import ProfitChart from "@/components/portal/profit-estimator/ProfitChart";
 import AddProjectModal from "@/components/portal/profit-estimator/AddProjectModal";
 import AddOverheadModal from "@/components/portal/profit-estimator/AddOverheadModal";
 import AddLaborRateModal from "@/components/portal/profit-estimator/AddLaborRateModal";
+import PortalLayout from "@/components/portal/PortalLayout";
 
 type TabType = "dashboard" | "projects" | "overhead" | "labor" | "tax";
 
@@ -287,34 +287,12 @@ export default function ProfitEstimatorPage() {
     );
   }
 
-  const user = session?.user as any || { name: "Demo User" };
-
   return (
-    <main className="min-h-screen bg-brand-bone">
-      {/* Header */}
-      <header className="bg-brand-plum text-brand-bone border-b-4 border-brand-gold">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-display font-bold uppercase">Profit Estimator</h1>
-              <p className="mt-1 text-brand-bone/80 font-sans">
-                Track projects, expenses, and profitability
-              </p>
-            </div>
-            <Link
-              href="/portal"
-              className="px-4 py-2 border-2 border-brand-bone text-brand-bone hover:bg-brand-bone hover:text-brand-plum transition-all font-mono text-sm uppercase tracking-widest"
-            >
-              Back to Portal
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* Tab Navigation */}
-      <nav className="bg-white border-b-2 border-brand-plum/20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex gap-8">
+    <PortalLayout>
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Tab Navigation */}
+        <div className="bg-white border-2 border-brand-plum mb-8">
+          <div className="flex gap-8 px-6">
             <button
               onClick={() => setActiveTab("dashboard")}
               className={`px-4 py-4 border-b-4 font-bold uppercase tracking-wider text-sm transition-all ${
@@ -367,10 +345,7 @@ export default function ProfitEstimatorPage() {
             </button>
           </div>
         </div>
-      </nav>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Dashboard Tab */}
         {activeTab === "dashboard" && (
           <>
@@ -810,6 +785,6 @@ export default function ProfitEstimatorPage() {
           fetchCalculations();
         }}
       />
-    </main>
+    </PortalLayout>
   );
 }
