@@ -2,7 +2,26 @@
 
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+interface CallLog {
+  id: string;
+  prospectName: string;
+  prospectCompany: string;
+  prospectPhone: string | null;
+  prospectEmail: string | null;
+  callOutcome: string;
+  callDuration: number | null;
+  notes: string | null;
+  callDate: string;
+  followUpDate: string | null;
+  user: {
+    id: string;
+    name: string | null;
+    email: string;
+    company: string | null;
+  };
+}
 
 export default function AdminCallsPage() {
   const { data: session } = useSession();
@@ -11,113 +30,96 @@ export default function AdminCallsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterClient, setFilterClient] = useState("all");
+  const [calls, setCalls] = useState<CallLog[]>([]);
+  const [clients, setClients] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock calls data
-  const calls = [
-    {
-      id: 1,
-      contactName: "John Smith",
-      company: "Acme Corp",
-      phone: "(555) 123-4567",
-      client: "John Smith (Acme Corp)",
-      clientId: 1,
-      status: "connected",
-      duration: "12:34",
-      outcome: "Meeting Scheduled",
-      notes: "Discussed Q1 needs, scheduling follow-up meeting for next week",
-      timestamp: "2 hours ago",
-      date: "Feb 17, 2026",
-    },
-    {
-      id: 2,
-      contactName: "Sarah Johnson",
-      company: "Tech Solutions Inc",
-      phone: "(555) 234-5678",
-      client: "Sarah Johnson (Tech Solutions)",
-      clientId: 2,
-      status: "voicemail",
-      duration: "0:45",
-      outcome: "Follow-up Required",
-      notes: "Left message about our services and pricing",
-      timestamp: "5 hours ago",
-      date: "Feb 17, 2026",
-    },
-    {
-      id: 3,
-      contactName: "Mike Davis",
-      company: "Global Manufacturing",
-      phone: "(555) 345-6789",
-      client: "Mike Davis (Global Manufacturing)",
-      clientId: 3,
-      status: "connected",
-      duration: "18:22",
-      outcome: "Qualified Lead",
-      notes: "Qualified lead - Budget $50K+, Timeline Q1 2026. Sending proposal.",
-      timestamp: "1 day ago",
-      date: "Feb 16, 2026",
-    },
-    {
-      id: 4,
-      contactName: "Lisa Chen",
-      company: "Enterprise Solutions LLC",
-      phone: "(555) 456-7890",
-      client: "Sarah Johnson (Tech Solutions)",
-      clientId: 2,
-      status: "connected",
-      duration: "15:10",
-      outcome: "Demo Scheduled",
-      notes: "Hot lead - Budget $75K+, immediate timeline. Scheduling demo.",
-      timestamp: "1 day ago",
-      date: "Feb 16, 2026",
-    },
-    {
-      id: 5,
-      contactName: "Robert Williams",
-      company: "Startup Ventures",
-      phone: "(555) 567-8901",
-      client: "John Smith (Acme Corp)",
-      clientId: 1,
-      status: "no-answer",
-      duration: "0:00",
-      outcome: "Retry",
-      notes: "No answer, will try again tomorrow",
-      timestamp: "2 days ago",
-      date: "Feb 15, 2026",
-    },
-    {
-      id: 6,
-      contactName: "Emily Brown",
-      company: "Marketing Pro",
-      phone: "(555) 678-9012",
-      client: "Mike Davis (Global Manufacturing)",
-      clientId: 3,
-      status: "connected",
-      duration: "8:45",
-      outcome: "Not Interested",
-      notes: "Not interested at this time, follow up in 6 months",
-      timestamp: "2 days ago",
-      date: "Feb 15, 2026",
-    },
-  ];
+  // Fetch calls and clients
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [callsRes, clientsRes] = await Promise.all([
+          fetch("/api/admin/calls"),
+          fetch("/api/admin/clients"),
+        ]);
+
+        if (callsRes.ok) {
+          const callsData = await callsRes.json();
+          setCalls(callsData.calls || []);
+        }
+
+        if (clientsRes.ok) {
+          const clientsData = await clientsRes.json();
+          setClients(clientsData.clients || []);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Helper functions
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    
+    if (diffHours < 1) return 'Less than an hour ago';
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString();
+  };
+
+  const formatDuration = (seconds: number | null) => {
+    if (!seconds) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const getOutcomeBadge = (outcome: string) => {
+    const badges: Record<string, string> = {
+      'CONNECTED': 'bg-green-100 text-green-700',
+      'SCHEDULED_MEETING': 'bg-blue-100 text-blue-700',
+      'VOICEMAIL': 'bg-yellow-100 text-yellow-700',
+      'NO_ANSWER': 'bg-gray-100 text-gray-700',
+      'GATEKEEPER': 'bg-orange-100 text-orange-700',
+      'NOT_INTERESTED': 'bg-red-100 text-red-700',
+    };
+    return badges[outcome] || 'bg-gray-100 text-gray-700';
+  };
+
+  const formatOutcome = (outcome: string) => {
+    return outcome.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  };
 
   const filteredCalls = calls.filter((call) => {
-    const matchesStatus = filterStatus === "all" || call.status === filterStatus;
-    const matchesClient = filterClient === "all" || call.clientId.toString() === filterClient;
+    const matchesStatus = filterStatus === "all" || call.callOutcome === filterStatus;
+    const matchesClient = filterClient === "all" || call.user.id === filterClient;
     const matchesSearch =
-      call.contactName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      call.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      call.client.toLowerCase().includes(searchQuery.toLowerCase());
+      call.prospectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      call.prospectCompany.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (call.user.name && call.user.name.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesStatus && matchesClient && matchesSearch;
   });
 
-  const getStatusBadge = (status: string) => {
-    const badges = {
-      connected: "bg-green-100 text-green-700",
-      voicemail: "bg-yellow-100 text-yellow-700",
-      "no-answer": "bg-red-100 text-red-700",
-    };
-    return badges[status as keyof typeof badges] || "bg-gray-100 text-gray-700";
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-brand-bone flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-brand-plum border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-brand-plum font-mono uppercase tracking-widest">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-brand-bone">
@@ -133,7 +135,7 @@ export default function AdminCallsPage() {
             </div>
             <div className="flex items-center gap-4">
               <span className="px-4 py-2 bg-brand-gold text-brand-plum font-mono text-sm uppercase tracking-widest font-bold">
-                ADMIN
+                {user?.role === "SUPER_ADMIN" ? "SUPER ADMIN" : user?.role || "ADMIN"}
               </span>
               <Link
                 href="/api/auth/signout"
@@ -180,6 +182,14 @@ export default function AdminCallsPage() {
             >
               Reports
             </Link>
+            {user?.role === "SUPER_ADMIN" && (
+              <Link
+                href="/admin/team"
+                className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
+              >
+                Team
+              </Link>
+            )}
           </div>
         </div>
       </nav>
@@ -219,17 +229,20 @@ export default function AdminCallsPage() {
             {/* Status Filter */}
             <div>
               <label className="block text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
-                Filter by Status
+                Filter by Outcome
               </label>
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
               >
-                <option value="all">All Calls</option>
-                <option value="connected">Connected</option>
-                <option value="voicemail">Voicemail</option>
-                <option value="no-answer">No Answer</option>
+                <option value="all">All Outcomes</option>
+                <option value="CONNECTED">Connected</option>
+                <option value="SCHEDULED_MEETING">Meeting Scheduled</option>
+                <option value="VOICEMAIL">Voicemail</option>
+                <option value="NO_ANSWER">No Answer</option>
+                <option value="GATEKEEPER">Gatekeeper</option>
+                <option value="NOT_INTERESTED">Not Interested</option>
               </select>
             </div>
 
@@ -244,9 +257,11 @@ export default function AdminCallsPage() {
                 className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
               >
                 <option value="all">All Clients</option>
-                <option value="1">John Smith (Acme Corp)</option>
-                <option value="2">Sarah Johnson (Tech Solutions)</option>
-                <option value="3">Mike Davis (Global Manufacturing)</option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.name} - {client.company}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -262,42 +277,60 @@ export default function AdminCallsPage() {
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-display font-bold text-brand-plum">{call.contactName}</h3>
+                    <h3 className="text-xl font-display font-bold text-brand-plum">{call.prospectName}</h3>
                     <span
-                      className={`px-3 py-1 text-xs font-mono uppercase ${getStatusBadge(call.status)}`}
+                      className={`px-3 py-1 text-xs font-mono uppercase ${getOutcomeBadge(call.callOutcome)}`}
                     >
-                      {call.status.replace("-", " ")}
+                      {formatOutcome(call.callOutcome)}
                     </span>
                   </div>
                   <div className="text-brand-charcoal/60 mb-1">
-                    <strong>{call.company}</strong> • {call.phone}
+                    <strong>{call.prospectCompany}</strong>
+                    {call.prospectPhone && ` • ${call.prospectPhone}`}
+                    {call.prospectEmail && ` • ${call.prospectEmail}`}
                   </div>
                   <div className="text-sm text-brand-charcoal/60 mb-2">
-                    Duration: {call.duration} • {call.timestamp}
+                    Duration: {formatDuration(call.callDuration)} • {formatDate(call.callDate)}
                   </div>
                   <div className="text-sm text-brand-charcoal/60">
-                    <span className="font-bold">Client:</span> {call.client}
+                    <span className="font-bold">Client:</span> {call.user.name || call.user.email}
+                    {call.user.company && ` (${call.user.company})`}
                   </div>
                 </div>
                 <div className="text-right">
                   <span className="px-4 py-2 bg-brand-gold/20 text-brand-plum font-mono text-sm uppercase tracking-widest font-bold">
-                    {call.outcome}
+                    {formatOutcome(call.callOutcome)}
                   </span>
                 </div>
               </div>
-              <div className="border-t-2 border-brand-plum/10 pt-4">
-                <p className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">Notes</p>
-                <p className="text-brand-charcoal">{call.notes}</p>
-              </div>
+              {call.notes && (
+                <div className="border-t-2 border-brand-plum/10 pt-4">
+                  <p className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">Notes</p>
+                  <p className="text-brand-charcoal">{call.notes}</p>
+                </div>
+              )}
+              {call.followUpDate && (
+                <div className="mt-2 text-sm text-brand-charcoal/60">
+                  <span className="font-bold">Follow-up:</span> {new Date(call.followUpDate).toLocaleDateString()}
+                </div>
+              )}
             </div>
           ))}
         </div>
 
-        {filteredCalls.length === 0 && (
+        {filteredCalls.length === 0 && !loading && (
           <div className="bg-white border-2 border-brand-plum p-12 text-center">
-            <p className="text-brand-charcoal/60 font-mono uppercase tracking-widest">
-              No calls found matching your filters
+            <p className="text-brand-charcoal/60 font-mono uppercase tracking-widest mb-4">
+              {calls.length === 0 ? "No calls logged yet" : "No calls found matching your filters"}
             </p>
+            {calls.length === 0 && (
+              <Link
+                href="/admin/calls/new"
+                className="inline-block px-6 py-3 bg-brand-plum text-brand-gold font-mono text-sm uppercase tracking-widest hover:bg-brand-gold hover:text-brand-plum border-2 border-brand-plum transition-all"
+              >
+                Log Your First Call
+              </Link>
+            )}
           </div>
         )}
       </div>
