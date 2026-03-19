@@ -46,6 +46,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
   const [leadId, setLeadId] = useState<string>("");
 
   const [formData, setFormData] = useState({
+    userId: "",
     companyName: "",
     contactName: "",
     contactTitle: "",
@@ -62,6 +63,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
     nextAction: "",
     nextActionDate: "",
   });
+  const [clients, setClients] = useState<any[]>([]);
 
   useEffect(() => {
     params.then((p) => {
@@ -72,11 +74,21 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
 
   const fetchLead = async (id: string) => {
     try {
-      const res = await fetch(`/api/admin/leads/${id}`);
-      if (res.ok) {
-        const data = await res.json();
+      const [leadRes, clientsRes] = await Promise.all([
+        fetch(`/api/admin/leads/${id}`),
+        fetch("/api/admin/clients"),
+      ]);
+
+      if (clientsRes.ok) {
+        const clientsData = await clientsRes.json();
+        setClients(clientsData.clients || []);
+      }
+
+      if (leadRes.ok) {
+        const data = await leadRes.json();
         setLead(data.lead);
         setFormData({
+          userId: data.lead.userId || "",
           companyName: data.lead.companyName || "",
           contactName: data.lead.contactName || "",
           contactTitle: data.lead.contactTitle || "",
@@ -308,6 +320,27 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
 
               {isEditing ? (
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Assigned Client */}
+                  <div>
+                    <label className="block text-sm font-bold text-brand-plum mb-2 uppercase tracking-wider">
+                      Assigned Client *
+                    </label>
+                    <select
+                      name="userId"
+                      value={formData.userId}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
+                    >
+                      <option value="">Select a client...</option>
+                      {clients.map((client) => (
+                        <option key={client.id} value={client.id}>
+                          {client.name} - {client.company}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                   {/* Company & Contact */}
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>

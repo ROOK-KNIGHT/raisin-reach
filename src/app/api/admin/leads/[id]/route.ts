@@ -80,6 +80,7 @@ export async function PUT(
     const body = await request.json();
 
     const {
+      userId,
       companyName,
       contactName,
       contactTitle,
@@ -98,9 +99,9 @@ export async function PUT(
     } = body;
 
     // Validate required fields
-    if (!companyName || !contactName) {
+    if (!companyName || !contactName || !userId) {
       return NextResponse.json(
-        { error: "Company name and contact name are required" },
+        { error: "Company name, contact name, and assigned client are required" },
         { status: 400 }
       );
     }
@@ -109,6 +110,7 @@ export async function PUT(
     const updatedLead = await prisma.lead.update({
       where: { id },
       data: {
+        userId,
         companyName,
         contactName,
         contactTitle: contactTitle || null,
