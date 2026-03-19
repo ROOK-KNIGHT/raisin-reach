@@ -2,13 +2,16 @@
 
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function NewLeadPage() {
   const { data: session } = useSession();
   const router = useRouter();
   const user = session?.user as any || { name: "Admin User" };
+
+  const [clients, setClients] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     // Client Selection
@@ -46,6 +49,24 @@ export default function NewLeadPage() {
     source: "",
     notes: "",
   });
+
+  useEffect(() => {
+    fetchClients();
+  }, []);
+
+  const fetchClients = async () => {
+    try {
+      const res = await fetch("/api/admin/clients");
+      if (res.ok) {
+        const data = await res.json();
+        setClients(data.clients || []);
+      }
+    } catch (error) {
+      console.error("Error fetching clients:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,12 +175,15 @@ export default function NewLeadPage() {
                 value={formData.clientId}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
+                disabled={loading}
+                className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans disabled:opacity-50"
               >
-                <option value="">Select a client...</option>
-                <option value="1">John Smith (Acme Corp)</option>
-                <option value="2">Sarah Johnson (Tech Solutions Inc)</option>
-                <option value="3">Mike Davis (Global Manufacturing)</option>
+                <option value="">{loading ? "Loading clients..." : "Select a client..."}</option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.name} {client.company ? `(${client.company})` : `- ${client.email}`}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
