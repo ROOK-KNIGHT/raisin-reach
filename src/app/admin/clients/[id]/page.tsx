@@ -38,6 +38,8 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [messageSubject, setMessageSubject] = useState("");
   const [messageContent, setMessageContent] = useState("");
+  const [messageCc, setMessageCc] = useState("");
+  const [messageBcc, setMessageBcc] = useState("");
   const [sending, setSending] = useState(false);
   const [noteContent, setNoteContent] = useState("");
   const [addingNote, setAddingNote] = useState(false);
@@ -77,6 +79,8 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
         body: JSON.stringify({
           subject: messageSubject,
           message: messageContent,
+          cc: messageCc,
+          bcc: messageBcc,
         }),
       });
 
@@ -85,6 +89,8 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
         setShowMessageModal(false);
         setMessageSubject("");
         setMessageContent("");
+        setMessageCc("");
+        setMessageBcc("");
       } else {
         toast.error("Failed to send message");
       }
@@ -498,6 +504,32 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
                   className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
                   placeholder="Enter email subject..."
                 />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-brand-plum mb-2 uppercase tracking-wider">
+                  CC (optional)
+                </label>
+                <input
+                  type="text"
+                  value={messageCc}
+                  onChange={(e) => setMessageCc(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
+                  placeholder="email1@example.com, email2@example.com"
+                />
+                <p className="text-xs text-brand-charcoal/60 mt-1">Separate multiple emails with commas</p>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-brand-plum mb-2 uppercase tracking-wider">
+                  BCC (optional)
+                </label>
+                <input
+                  type="text"
+                  value={messageBcc}
+                  onChange={(e) => setMessageBcc(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
+                  placeholder="email1@example.com, email2@example.com"
+                />
+                <p className="text-xs text-brand-charcoal/60 mt-1">Separate multiple emails with commas</p>
               </div>
               <div className="mb-6">
                 <label className="block text-sm font-bold text-brand-plum mb-2 uppercase tracking-wider">

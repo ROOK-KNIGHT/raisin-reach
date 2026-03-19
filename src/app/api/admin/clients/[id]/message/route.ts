@@ -25,7 +25,7 @@ export async function POST(
     }
 
     const { id: clientId } = await params;
-    const { subject, message } = await request.json();
+    const { subject, message, cc, bcc } = await request.json();
 
     if (!subject || !message) {
       return NextResponse.json(
@@ -49,10 +49,27 @@ export async function POST(
       return NextResponse.json({ error: "Client not found" }, { status: 404 });
     }
 
+    // Parse CC and BCC emails
+    const ccEmails = cc
+      ? cc
+          .split(",")
+          .map((email: string) => email.trim())
+          .filter((email: string) => email.length > 0)
+      : [];
+
+    const bccEmails = bcc
+      ? bcc
+          .split(",")
+          .map((email: string) => email.trim())
+          .filter((email: string) => email.length > 0)
+      : [];
+
     // Send email via Resend
     const { data, error } = await resend.emails.send({
       from: "Raisin Reach <noreply@raisinreach.com>",
       to: [client.email],
+      ...(ccEmails.length > 0 && { cc: ccEmails }),
+      ...(bccEmails.length > 0 && { bcc: bccEmails }),
       subject: subject,
       html: `
         <!DOCTYPE html>
