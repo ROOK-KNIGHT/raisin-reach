@@ -3,6 +3,78 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
+export async function POST(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Get user from database
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const body = await request.json();
+    const {
+      companyName,
+      contactName,
+      contactTitle,
+      contactEmail,
+      contactPhone,
+      status,
+      source,
+      industry,
+      budget,
+      authority,
+      need,
+      timeline,
+      notes,
+    } = body;
+
+    // Validate required fields
+    if (!companyName || !contactName) {
+      return NextResponse.json(
+        { error: 'Missing required fields: companyName, contactName' },
+        { status: 400 }
+      );
+    }
+
+    // Create the lead for the authenticated user
+    const lead = await prisma.lead.create({
+      data: {
+        userId: user.id,
+        companyName,
+        contactName,
+        contactTitle,
+        contactEmail,
+        contactPhone,
+        status: status || 'NEW',
+        source,
+        industry,
+        budget,
+        authority,
+        need,
+        timeline,
+        notes,
+      },
+    });
+
+    return NextResponse.json({ lead }, { status: 201 });
+  } catch (error) {
+    console.error('Error creating lead:', error);
+    return NextResponse.json(
+      { error: 'Failed to create lead' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);

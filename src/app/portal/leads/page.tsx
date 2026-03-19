@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import AddLeadModal from "@/components/portal/AddLeadModal";
 
 interface Lead {
   id: string;
@@ -29,6 +30,7 @@ export default function LeadsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAddLeadModalOpen, setIsAddLeadModalOpen] = useState(false);
 
   // Fetch leads from API
   useEffect(() => {
@@ -187,9 +189,17 @@ export default function LeadsPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="mb-8">
-          <h2 className="text-4xl font-display font-bold text-brand-plum uppercase mb-2">Leads Pipeline</h2>
-          <p className="text-brand-charcoal/60">Track and manage your qualified prospects</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h2 className="text-4xl font-display font-bold text-brand-plum uppercase mb-2">Leads Pipeline</h2>
+            <p className="text-brand-charcoal/60">Track and manage your qualified prospects</p>
+          </div>
+          <button
+            onClick={() => setIsAddLeadModalOpen(true)}
+            className="px-6 py-3 bg-brand-gold text-brand-plum font-mono text-sm uppercase tracking-widest font-bold hover:bg-brand-plum hover:text-brand-gold border-2 border-brand-plum transition-all"
+          >
+            + Add New Lead
+          </button>
         </div>
 
         {/* Filters */}
@@ -327,6 +337,13 @@ export default function LeadsPage() {
           </div>
         )}
       </div>
+
+      {/* Add Lead Modal */}
+      <AddLeadModal
+        isOpen={isAddLeadModalOpen}
+        onClose={() => setIsAddLeadModalOpen(false)}
+        onSuccess={fetchLeads}
+      />
     </main>
   );
 }
