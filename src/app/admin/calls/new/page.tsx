@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 
 export default function NewCallLogPage() {
@@ -23,6 +23,23 @@ export default function NewCallLogPage() {
     followUpDate: "",
   });
   const [loading, setLoading] = useState(false);
+  const [clients, setClients] = useState<any[]>([]);
+
+  // Fetch clients on mount
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const res = await fetch("/api/admin/clients");
+        if (res.ok) {
+          const data = await res.json();
+          setClients(data.clients || []);
+        }
+      } catch (error) {
+        console.error("Error fetching clients:", error);
+      }
+    };
+    fetchClients();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,9 +178,11 @@ export default function NewCallLogPage() {
                 className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
               >
                 <option value="">Select a client...</option>
-                {/* These will be populated from API */}
-                <option value="client1">John Smith - Acme Corp</option>
-                <option value="client2">Sarah Johnson - Tech Solutions Inc</option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.name} - {client.company}
+                  </option>
+                ))}
               </select>
             </div>
 
