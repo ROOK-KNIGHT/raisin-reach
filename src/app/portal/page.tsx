@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import PortalLayout from "@/components/portal/PortalLayout";
 
 interface Stats {
   totalCalls: number;
@@ -43,7 +44,6 @@ export default function PortalDashboard() {
   const [recentCalls, setRecentCalls] = useState<CallLog[]>([]);
   const [hotLeads, setHotLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Redirect to sign-in if not authenticated
   useEffect(() => {
@@ -99,9 +99,6 @@ export default function PortalDashboard() {
     );
   }
 
-  // Mock user for demo
-  const user = session?.user as any || { name: "Demo User", membershipStatus: "ACTIVE" };
-
   // Helper function to format call outcome
   const formatOutcome = (outcome: string) => {
     const outcomeMap: Record<string, { label: string; color: string }> = {
@@ -130,186 +127,7 @@ export default function PortalDashboard() {
   };
 
   return (
-    <main className="min-h-screen bg-brand-bone">
-      {/* Header */}
-      <header className="bg-brand-plum text-brand-bone border-b-4 border-brand-gold">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {/* Mobile Menu Button */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 text-brand-bone hover:bg-brand-bone/10 transition-colors"
-                aria-label="Toggle menu"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  {mobileMenuOpen ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  )}
-                </svg>
-              </button>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-display font-bold uppercase">Client Portal</h1>
-                <p className="mt-1 text-brand-bone/80 font-sans text-sm">
-                  Welcome back, <strong>{user.name}</strong>
-                </p>
-              </div>
-            </div>
-            <div className="hidden md:flex items-center gap-4">
-              <span className="px-4 py-2 bg-brand-gold text-brand-plum font-mono text-sm uppercase tracking-widest font-bold">
-                {user.membershipStatus || "ACTIVE"}
-              </span>
-              <Link
-                href="/api/auth/signout"
-                className="px-4 py-2 border-2 border-brand-bone text-brand-bone hover:bg-brand-bone hover:text-brand-plum transition-all font-mono text-sm uppercase tracking-widest"
-              >
-                Sign Out
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Side Menu */}
-      {mobileMenuOpen && (
-        <>
-          {/* Overlay */}
-          <div 
-            className="fixed inset-0 bg-black/50 z-40 md:hidden"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-          
-          {/* Side Menu */}
-          <div className="fixed top-0 left-0 h-full w-64 bg-white z-50 shadow-lg md:hidden">
-            <div className="p-6 bg-brand-plum text-brand-bone">
-              <div className="flex items-center justify-between">
-                <h2 className="font-display font-bold uppercase text-lg">Menu</h2>
-                <button
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-1 hover:bg-brand-bone/10 transition-colors"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-            <nav className="p-4">
-              <Link
-                href="/portal"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-3 mb-2 bg-brand-plum text-brand-bone font-bold uppercase tracking-wider text-sm"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/portal/call-logs"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-3 mb-2 text-brand-charcoal hover:bg-brand-plum/10 transition-colors font-bold uppercase tracking-wider text-sm"
-              >
-                Call Logs
-              </Link>
-              <Link
-                href="/portal/leads"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-3 mb-2 text-brand-charcoal hover:bg-brand-plum/10 transition-colors font-bold uppercase tracking-wider text-sm"
-              >
-                Leads
-              </Link>
-              <Link
-                href="/portal/focus-areas"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-3 mb-2 text-brand-charcoal hover:bg-brand-plum/10 transition-colors font-bold uppercase tracking-wider text-sm"
-              >
-                Focus Areas
-              </Link>
-              <Link
-                href="/portal/profit-estimator"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-3 mb-2 text-brand-charcoal hover:bg-brand-plum/10 transition-colors font-bold uppercase tracking-wider text-sm"
-              >
-                Profit Estimator
-              </Link>
-              <Link
-                href="/portal/social-media"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-3 mb-2 text-brand-charcoal hover:bg-brand-plum/10 transition-colors font-bold uppercase tracking-wider text-sm"
-              >
-                Social Media
-              </Link>
-              <Link
-                href="/portal/settings"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-3 mb-2 text-brand-charcoal hover:bg-brand-plum/10 transition-colors font-bold uppercase tracking-wider text-sm"
-              >
-                Settings
-              </Link>
-              <div className="mt-6 pt-6 border-t-2 border-brand-plum/20">
-                <Link
-                  href="/api/auth/signout"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block px-4 py-3 bg-brand-plum text-brand-bone text-center font-bold uppercase tracking-wider text-sm"
-                >
-                  Sign Out
-                </Link>
-              </div>
-            </nav>
-          </div>
-        </>
-      )}
-
-      {/* Desktop Navigation */}
-      <nav className="hidden md:block bg-white border-b-2 border-brand-plum/20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex gap-8">
-            <Link
-              href="/portal"
-              className="px-2 md:px-4 py-4 border-b-4 border-brand-plum text-brand-plum font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap flex-shrink-0"
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/portal/call-logs"
-              className="px-2 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap flex-shrink-0"
-            >
-              Call Logs
-            </Link>
-            <Link
-              href="/portal/leads"
-              className="px-2 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap flex-shrink-0"
-            >
-              Leads
-            </Link>
-            <Link
-              href="/portal/focus-areas"
-              className="px-2 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap flex-shrink-0"
-            >
-              Focus Areas
-            </Link>
-            <Link
-              href="/portal/profit-estimator"
-              className="px-2 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap flex-shrink-0"
-            >
-              Profit Estimator
-            </Link>
-            <Link
-              href="/portal/social-media"
-              className="px-2 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap flex-shrink-0"
-            >
-              Social Media
-            </Link>
-            <Link
-              href="/portal/settings"
-              className="px-2 md:px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-xs md:text-sm whitespace-nowrap flex-shrink-0"
-            >
-              Settings
-            </Link>
-          </div>
-        </div>
-      </nav>
-
+    <PortalLayout>
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Stats Grid */}
@@ -427,6 +245,6 @@ export default function PortalDashboard() {
           </div>
         </div>
       </div>
-    </main>
+    </PortalLayout>
   );
 }
