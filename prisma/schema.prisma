@@ -80,6 +80,10 @@ model User {
   // Admin invites sent
   sentInvites       AdminInvite[] @relation("InvitedBy")
   
+  // Admin notes (for admins to add notes about clients)
+  adminNotes        AdminNote[] @relation("ClientNotes")
+  createdNotes      AdminNote[] @relation("CreatedBy")
+  
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -93,6 +97,22 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// Admin Notes Model
+model AdminNote {
+  id          String   @id @default(cuid())
+  clientId    String
+  client      User     @relation("ClientNotes", fields: [clientId], references: [id], onDelete: Cascade)
+  createdById String
+  createdBy   User     @relation("CreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  content     String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([clientId])
+  @@index([createdById])
+  @@index([createdAt])
 }
 
 // Admin Invite Model
