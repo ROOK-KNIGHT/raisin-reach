@@ -114,29 +114,45 @@ export default function ProspectsPage() {
   const [filterSource, setFilterSource] = useState("all");
   const [prospects] = useState<Prospect[]>(mockProspects);
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [reviewQuery, setReviewQuery] = useState("");
-  const [reviewLocation, setReviewLocation] = useState("");
-  const [reviewIndustry, setReviewIndustry] = useState("");
+  const [selectedProspects, setSelectedProspects] = useState<string[]>([]);
   const [isReviewing, setIsReviewing] = useState(false);
   const [reviewProgress, setReviewProgress] = useState(0);
 
+  const toggleProspectSelection = (prospectId: string) => {
+    setSelectedProspects(prev => 
+      prev.includes(prospectId) 
+        ? prev.filter(id => id !== prospectId)
+        : [...prev, prospectId]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedProspects.length === filteredProspects.length) {
+      setSelectedProspects([]);
+    } else {
+      setSelectedProspects(filteredProspects.map(p => p.id));
+    }
+  };
+
   const handleRunReview = async () => {
-    if (!reviewQuery) {
-      alert("Please enter a search query");
+    if (selectedProspects.length === 0) {
+      alert("Please select at least one prospect to review");
       return;
     }
 
     setIsReviewing(true);
     setReviewProgress(0);
 
+    // Get selected prospect details
+    const selectedProspectData = prospects.filter(p => selectedProspects.includes(p.id));
+
     try {
       const response = await fetch("/api/admin/prospects/review", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          searchQuery: reviewQuery,
-          location: reviewLocation,
-          industry: reviewIndustry,
+          prospectIds: selectedProspects,
+          prospects: selectedProspectData,
         }),
       });
 
@@ -151,7 +167,8 @@ export default function ProspectsPage() {
               clearInterval(interval);
               setIsReviewing(false);
               setShowReviewModal(false);
-              alert(`Review complete! Found ${data.prospectsFound || 47} prospects.`);
+              setSelectedProspects([]);
+              alert(`Review complete! Enriched ${selectedProspects.length} prospects with data from 6 sources.`);
               return 100;
             }
             return prev + 10;
@@ -399,15 +416,53 @@ export default function ProspectsPage() {
           </div>
         </div>
 
+        {/* Selection Controls */}
+        {filteredProspects.length > 0 && (
+          <div className="bg-white border-2 border-brand-plum p-4 mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <input
+                type="checkbox"
+                checked={selectedProspects.length === filteredProspects.length && filteredProspects.length > 0}
+                onChange={toggleSelectAll}
+                className="w-5 h-5 border-2 border-brand-plum"
+              />
+              <span className="font-mono text-sm uppercase tracking-widest text-brand-charcoal/80">
+                {selectedProspects.length > 0 
+                  ? `${selectedProspects.length} Selected` 
+                  : 'Select All'}
+              </span>
+            </div>
+            {selectedProspects.length > 0 && (
+              <button
+                onClick={() => setSelectedProspects([])}
+                className="px-4 py-2 text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 hover:text-brand-plum transition-all"
+              >
+                Clear Selection
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Prospects List */}
         <div className="space-y-4">
           {filteredProspects.map((prospect) => (
             <div
               key={prospect.id}
-              className="bg-white border-2 border-brand-plum p-6 shadow-[2px_2px_0px_0px_var(--color-brand-plum)]"
+              className={`bg-white border-2 p-6 shadow-[2px_2px_0px_0px_var(--color-brand-plum)] transition-all ${
+                selectedProspects.includes(prospect.id) 
+                  ? 'border-green-600 bg-green-50' 
+                  : 'border-brand-plum'
+              }`}
             >
               <div className="flex justify-between items-start mb-4">
-                <div className="flex-1">
+                <div className="flex items-start gap-4 flex-1">
+                  <input
+                    type="checkbox"
+                    checked={selectedProspects.includes(prospect.id)}
+                    onChange={() => toggleProspectSelection(prospect.id)}
+                    className="w-5 h-5 border-2 border-brand-plum mt-1"
+                  />
+                  <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="text-2xl font-display font-bold text-brand-plum">{prospect.companyName}</h3>
                     <span className={`px-3 py-1 text-xs font-mono uppercase font-bold ${getStatusBadge(prospect.status)}`}>
@@ -433,6 +488,7 @@ export default function ProspectsPage() {
                         {tag}
                       </span>
                     ))}
+                  </div>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -499,74 +555,50 @@ export default function ProspectsPage() {
               🔍 Run Prospect Review
             </h3>
             <p className="text-brand-charcoal/80 mb-6">
-              Scrape multiple sources to find and qualify prospects: websites, social media (LinkedIn, Facebook, Twitter), Yelp, and Google.
+              Enrich selected prospects with data from multiple sources: websites, social media (LinkedIn, Facebook, Twitter), Yelp, and Google.
             </p>
 
             {!isReviewing ? (
               <>
-                <div className="space-y-4 mb-6">
-                  <div>
-                    <label className="block text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
-                      Search Query *
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g., HVAC contractors, Plumbers, Electricians"
-                      value={reviewQuery}
-                      onChange={(e) => setReviewQuery(e.target.value)}
-                      className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
-                    />
+                <div className="bg-brand-bone p-6 border-l-4 border-brand-gold mb-6">
+                  <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
+                    Selected Prospects
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
-                      Location
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g., Sacramento, CA or United States"
-                      value={reviewLocation}
-                      onChange={(e) => setReviewLocation(e.target.value)}
-                      className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
-                    />
+                  <div className="text-2xl font-display font-bold text-brand-plum mb-3">
+                    {selectedProspects.length} {selectedProspects.length === 1 ? 'Prospect' : 'Prospects'}
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
-                      Industry
-                    </label>
-                    <select
-                      value={reviewIndustry}
-                      onChange={(e) => setReviewIndustry(e.target.value)}
-                      className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
-                    >
-                      <option value="">All Industries</option>
-                      <option value="Plumbing">Plumbing</option>
-                      <option value="HVAC">HVAC</option>
-                      <option value="Electrical">Electrical</option>
-                      <option value="Roofing">Roofing</option>
-                      <option value="Landscaping">Landscaping</option>
-                      <option value="General Contractor">General Contractor</option>
-                    </select>
-                  </div>
+                  {selectedProspects.length > 0 && (
+                    <div className="space-y-1">
+                      {prospects.filter(p => selectedProspects.includes(p.id)).map(p => (
+                        <div key={p.id} className="text-sm text-brand-charcoal/80">
+                          • {p.companyName} ({p.contactName})
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {selectedProspects.length === 0 && (
+                    <p className="text-sm text-brand-charcoal/60">
+                      No prospects selected. Please select prospects from the list to review.
+                    </p>
+                  )}
                 </div>
 
-                <div className="bg-brand-bone p-4 border-l-4 border-brand-gold mb-6">
+                <div className="bg-yellow-50 p-4 border-l-4 border-yellow-500 mb-6">
                   <p className="text-sm text-brand-charcoal/80">
                     <strong>Sources to scrape:</strong> Website data, LinkedIn, Facebook, Twitter/X, Yelp, Google Business
                   </p>
                   <p className="text-sm text-brand-charcoal/60 mt-2">
-                    Estimated time: 3-5 minutes
+                    Estimated time: ~30 seconds per prospect
                   </p>
                 </div>
 
                 <div className="flex gap-3">
                   <button
                     onClick={handleRunReview}
-                    disabled={!reviewQuery}
+                    disabled={selectedProspects.length === 0}
                     className="flex-1 px-6 py-3 bg-green-600 text-white font-mono text-sm uppercase tracking-widest font-bold hover:bg-green-700 border-2 border-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Start Review
+                    Start Review ({selectedProspects.length})
                   </button>
                   <button
                     onClick={() => setShowReviewModal(false)}
