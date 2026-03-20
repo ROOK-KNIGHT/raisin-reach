@@ -100,6 +100,12 @@ export default function AdminDashboard() {
               Clients
             </Link>
             <Link
+              href="/admin/prospects"
+              className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
+            >
+              Prospects
+            </Link>
+            <Link
               href="/admin/leads"
               className="px-4 py-4 border-b-4 border-transparent text-brand-charcoal/60 hover:text-brand-plum hover:border-brand-plum/30 transition-all font-bold uppercase tracking-wider text-sm"
             >
