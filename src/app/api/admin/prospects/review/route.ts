@@ -1,17 +1,20 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { enrichProspect } from "@/lib/enrichment/aggregator";
+import { generateSalesIntelligence, calculateBasicReadinessScore } from "@/lib/enrichment/ai-intelligence";
 
 /**
  * POST /api/admin/prospects/review
  * 
- * Runs a comprehensive prospect review by scraping multiple sources:
- * - Website scraping (company info, services, contact details)
- * - Social media (LinkedIn, Facebook, Twitter/X)
- * - Yelp (reviews, ratings, business info)
- * - Google (reviews, business profile, maps data)
+ * Runs a comprehensive prospect review by enriching from multiple sources:
+ * - Google Places API (business info, reviews, ratings)
+ * - Yelp Fusion API (reviews, ratings, categories)
+ * - Website scraping (contact info, social links, content)
+ * - Claude AI analysis (sales intelligence, pain points, conversation starters)
  * 
- * This creates a complete network profile for prospect evaluation
+ * This creates a complete sales intelligence profile for the prospect
  */
 export async function POST(request: Request) {
   try {
@@ -29,46 +32,145 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { searchQuery, location, industry, sources } = body;
+    const { prospectIds, prospects } = body;
 
     // Validate required fields
-    if (!searchQuery) {
+    if (!prospectIds || !Array.isArray(prospectIds) || prospectIds.length === 0) {
       return NextResponse.json(
-        { error: "Search query is required" },
+        { error: "Prospect IDs are required" },
         { status: 400 }
       );
     }
 
-    // Mock response - in production, this would trigger actual scraping
-    const mockResults = {
-      status: "processing",
-      jobId: `review_${Date.now()}`,
-      message: "Prospect review started. This may take several minutes.",
-      sources: sources || [
-        "website",
-        "linkedin",
-        "facebook", 
-        "twitter",
-        "yelp",
-        "google"
-      ],
-      estimatedTime: "3-5 minutes",
-      searchParams: {
-        query: searchQuery,
-        location: location || "United States",
-        industry: industry || "All Industries"
+    // Process each prospect
+    const results = [];
+    
+    for (const prospectId of prospectIds) {
+      try {
+        // Get prospect from database
+        const prospect = await prisma.prospect.findUnique({
+          where: { id: prospectId },
+        });
+
+        if (!prospect) {
+          results.push({
+            prospectId,
+            status: "error",
+            error: "Prospect not found",
+          });
+          continue;
+        }
+
+        // Create enrichment job
+        const enrichmentJob = await prisma.enrichmentJob.create({
+          data: {
+            prospectId: prospect.id,
+            status: "PROCESSING",
+            progress: 0,
+            sources: ["google", "yelp", "website"],
+            sourcesCompleted: [],
+            sourcesFailed: [],
+          },
+        });
+
+        // Run enrichment
+        const enrichmentData = await enrichProspect(
+          prospect.companyName,
+          prospect.location || undefined,
+          prospect.website || undefined,
+          { google: true, yelp: true, website: true }
+        );
+
+        // Generate AI sales intelligence
+        let salesIntelligence;
+        let aiConfidence = "MEDIUM";
+        
+        try {
+          salesIntelligence = await generateSalesIntelligence(enrichmentData);
+          aiConfidence = salesIntelligence.aiConfidence;
+        } catch (aiError) {
+          console.error("AI intelligence generation failed, using fallback:", aiError);
+          // Fallback to basic scoring if AI fails
+          const basicScore = calculateBasicReadinessScore(enrichmentData);
+          salesIntelligence = {
+            readinessScore: basicScore,
+            aiConfidence: "LOW",
+          };
+        }
+
+        // Update prospect with enriched data
+        await prisma.prospect.update({
+          where: { id: prospect.id },
+          data: {
+            // Update from merged data
+            contactPhone: enrichmentData.merged.contactPhone || prospect.contactPhone,
+            contactEmail: enrichmentData.merged.contactEmail || prospect.contactEmail,
+            website: enrichmentData.merged.website || prospect.website,
+            address: enrichmentData.merged.address || prospect.address,
+            city: enrichmentData.merged.city || prospect.city,
+            state: enrichmentData.merged.state || prospect.state,
+            zipCode: enrichmentData.merged.zipCode || prospect.zipCode,
+            facebookUrl: enrichmentData.merged.socialLinks?.facebook || prospect.facebookUrl,
+            twitterUrl: enrichmentData.merged.socialLinks?.twitter || prospect.twitterUrl,
+            linkedinUrl: enrichmentData.merged.socialLinks?.linkedin || prospect.linkedinUrl,
+            yelpUrl: enrichmentData.sources.yelp?.yelpUrl || prospect.yelpUrl,
+            googlePlaceId: enrichmentData.sources.google?.googlePlaceId || prospect.googlePlaceId,
+            
+            // Update from AI intelligence
+            industry: salesIntelligence.industry || prospect.industry,
+            companySize: salesIntelligence.companySize || prospect.companySize,
+            yearsInBusiness: salesIntelligence.yearsInBusiness || prospect.yearsInBusiness,
+            servicesOffered: salesIntelligence.servicesOffered || prospect.servicesOffered,
+            contactName: salesIntelligence.contactName || prospect.contactName,
+            contactTitle: salesIntelligence.contactTitle || prospect.contactTitle,
+            
+            // Store enrichment and intelligence data
+            enrichmentData: enrichmentData as any,
+            salesIntelligence: salesIntelligence as any,
+            aiConfidence,
+            readinessScore: salesIntelligence.readinessScore,
+            lastEnrichedAt: new Date(),
+            status: "RESEARCHING",
+          },
+        });
+
+        // Update enrichment job
+        await prisma.enrichmentJob.update({
+          where: { id: enrichmentJob.id },
+          data: {
+            status: "COMPLETED",
+            progress: 100,
+            sourcesCompleted: enrichmentData.metadata.sourcesSucceeded,
+            sourcesFailed: enrichmentData.metadata.sourcesFailed,
+            completedAt: new Date(),
+          },
+        });
+
+        results.push({
+          prospectId,
+          status: "success",
+          readinessScore: salesIntelligence.readinessScore,
+          sourcesEnriched: enrichmentData.metadata.sourcesSucceeded.length,
+        });
+
+      } catch (error) {
+        console.error(`Error enriching prospect ${prospectId}:`, error);
+        results.push({
+          prospectId,
+          status: "error",
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
       }
-    };
+    }
 
-    // In production, you would:
-    // 1. Queue a background job (using Bull, BullMQ, or similar)
-    // 2. Use Puppeteer/Playwright for web scraping
-    // 3. Use official APIs where available (Yelp API, Google Places API)
-    // 4. Use scraping services (ScraperAPI, Bright Data) for anti-bot protection
-    // 5. Store results in database
-    // 6. Update prospect records with enriched data
+    return NextResponse.json({
+      status: "completed",
+      results,
+      totalProcessed: prospectIds.length,
+      successful: results.filter(r => r.status === "success").length,
+      failed: results.filter(r => r.status === "error").length,
+    });
 
-    return NextResponse.json(mockResults, { status: 202 });
   } catch (error) {
     console.error("Error starting prospect review:", error);
     return NextResponse.json(
