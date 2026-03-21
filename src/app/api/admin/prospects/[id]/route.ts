@@ -10,8 +10,9 @@ import { prisma } from "@/lib/prisma";
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const session = await getServerSession(authOptions);
 
@@ -26,7 +27,7 @@ export async function GET(
     }
 
     const prospect = await prisma.prospect.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         assignedTo: {
           select: {
@@ -77,8 +78,9 @@ export async function GET(
  */
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const session = await getServerSession(authOptions);
 
@@ -124,7 +126,7 @@ export async function PUT(
     } = body;
 
     const prospect = await prisma.prospect.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         companyName,
         website,
@@ -183,8 +185,9 @@ export async function PUT(
  */
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const session = await getServerSession(authOptions);
 
@@ -199,7 +202,7 @@ export async function DELETE(
     }
 
     await prisma.prospect.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });
