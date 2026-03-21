@@ -2,8 +2,9 @@
 
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import SalesIntelligencePanel from "@/components/admin/SalesIntelligencePanel";
 
 interface Prospect {
   id: string;
@@ -395,6 +396,13 @@ export default function ProspectDetailPage() {
 
           {/* Right Column */}
           <div className="space-y-8">
+            {/* AI Sales Intelligence Panel */}
+            <SalesIntelligencePanel
+              intelligence={null}
+              aiConfidence={undefined}
+              lastEnrichedAt={undefined}
+            />
+
             {/* Readiness Score Breakdown */}
             <div className="bg-white border-2 border-brand-plum p-6">
               <h3 className="text-2xl font-display font-bold text-brand-plum uppercase mb-4">Score Breakdown</h3>
