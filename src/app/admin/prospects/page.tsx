@@ -34,6 +34,11 @@ export default function ProspectsPage() {
   const [selectedProspects, setSelectedProspects] = useState<string[]>([]);
   const [isReviewing, setIsReviewing] = useState(false);
   const [reviewProgress, setReviewProgress] = useState(0);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [csvAnalysis, setCsvAnalysis] = useState<any>(null);
 
   // Fetch prospects on mount
   useEffect(() => {
@@ -115,6 +120,84 @@ export default function ProspectsPage() {
       console.error("Error running review:", error);
       setIsReviewing(false);
       alert("Failed to start review");
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploadFile(file);
+    }
+  };
+
+  const handleAnalyzeCSV = async () => {
+    if (!uploadFile) return;
+
+    setIsAnalyzing(true);
+    const formData = new FormData();
+    formData.append("file", uploadFile);
+
+    try {
+      const response = await fetch("/api/admin/prospects/import/analyze", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCsvAnalysis(data);
+      } else {
+        const error = await response.json();
+        alert(`Failed to analyze CSV: ${error.error || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Error analyzing CSV:", error);
+      alert("Failed to analyze CSV file");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleImportCSV = async () => {
+    if (!uploadFile || !csvAnalysis) return;
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append("file", uploadFile);
+    formData.append("analysis", JSON.stringify(csvAnalysis.analysis));
+
+    try {
+      const response = await fetch("/api/admin/prospects/import", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(
+          `Import complete!\n\n` +
+          `Total rows: ${data.stats.totalRows}\n` +
+          `Imported: ${data.stats.imported}\n` +
+          `Skipped: ${data.stats.skipped}\n` +
+          `Duplicates in file: ${data.stats.duplicatesInFile}\n` +
+          `Duplicates in database: ${data.stats.duplicatesInDatabase}\n` +
+          `Errors: ${data.stats.errors}`
+        );
+        
+        // Close modal and refresh
+        setShowUploadModal(false);
+        setUploadFile(null);
+        setCsvAnalysis(null);
+        await fetchProspects();
+      } else {
+        const error = await response.json();
+        alert(`Failed to import CSV: ${error.error || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Error importing CSV:", error);
+      alert("Failed to import CSV file");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -263,7 +346,10 @@ export default function ProspectsPage() {
             >
               🔍 Run Prospect Review
             </button>
-            <button className="px-6 py-3 border-2 border-brand-plum text-brand-plum font-mono text-sm uppercase tracking-widest hover:bg-brand-plum hover:text-brand-bone transition-all">
+            <button 
+              onClick={() => setShowUploadModal(true)}
+              className="px-6 py-3 border-2 border-brand-plum text-brand-plum font-mono text-sm uppercase tracking-widest hover:bg-brand-plum hover:text-brand-bone transition-all"
+            >
               Upload CSV
             </button>
             <button className="px-6 py-3 bg-brand-gold text-brand-plum font-mono text-sm uppercase tracking-widest font-bold hover:bg-brand-plum hover:text-brand-gold border-2 border-brand-plum transition-all">
@@ -561,6 +647,149 @@ export default function ProspectsPage() {
                   <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-brand-plum"></div>
                 </div>
               </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Upload CSV Modal */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white border-4 border-brand-plum p-8 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-2xl font-display font-bold text-brand-plum uppercase mb-4">
+              📤 Upload CSV File
+            </h3>
+            <p className="text-brand-charcoal/80 mb-6">
+              Upload a CSV file containing prospect data. Our AI will automatically detect the format and map columns.
+            </p>
+
+            {!csvAnalysis ? (
+              <>
+                <div className="bg-brand-bone p-6 border-l-4 border-brand-gold mb-6">
+                  <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
+                    Select File
+                  </div>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileSelect}
+                    className="w-full px-4 py-3 border-2 border-brand-plum/20 focus:border-brand-plum focus:outline-none font-sans"
+                  />
+                  {uploadFile && (
+                    <div className="mt-3 text-sm text-brand-charcoal/80">
+                      Selected: <strong>{uploadFile.name}</strong> ({(uploadFile.size / 1024).toFixed(2)} KB)
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-blue-50 p-4 border-l-4 border-blue-500 mb-6">
+                  <p className="text-sm text-brand-charcoal/80">
+                    <strong>Supported columns:</strong> Company Name, Contact Name, Email, Phone, Industry, Location, Website, LinkedIn, Facebook, Twitter, Yelp, and more.
+                  </p>
+                  <p className="text-sm text-brand-charcoal/60 mt-2">
+                    The AI will automatically detect and map your CSV columns to the correct fields.
+                  </p>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleAnalyzeCSV}
+                    disabled={!uploadFile || isAnalyzing}
+                    className="flex-1 px-6 py-3 bg-brand-plum text-white font-mono text-sm uppercase tracking-widest font-bold hover:bg-brand-plum/90 border-2 border-brand-plum transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isAnalyzing ? "Analyzing..." : "Analyze CSV"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowUploadModal(false);
+                      setUploadFile(null);
+                      setCsvAnalysis(null);
+                    }}
+                    className="flex-1 px-6 py-3 border-2 border-brand-plum text-brand-plum font-mono text-sm uppercase tracking-widest hover:bg-brand-plum hover:text-brand-bone transition-all"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="bg-green-50 p-6 border-l-4 border-green-500 mb-6">
+                  <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-2">
+                    Analysis Complete
+                  </div>
+                  <div className="text-2xl font-display font-bold text-green-600 mb-3">
+                    ✓ Ready to Import
+                  </div>
+                  <div className="space-y-1 text-sm text-brand-charcoal/80">
+                    <div>• File: <strong>{csvAnalysis.fileName}</strong></div>
+                    <div>• Total rows: <strong>{csvAnalysis.totalRows}</strong></div>
+                    <div>• Source detected: <strong>{csvAnalysis.analysis.source}</strong></div>
+                    <div>• Columns mapped: <strong>{Object.keys(csvAnalysis.analysis.columnMapping).length}</strong></div>
+                  </div>
+                </div>
+
+                <div className="bg-brand-bone p-6 border-l-4 border-brand-gold mb-6 max-h-64 overflow-y-auto">
+                  <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-3">
+                    Column Mapping Preview
+                  </div>
+                  <div className="space-y-2">
+                    {Object.entries(csvAnalysis.analysis.columnMapping).map(([field, csvColumn]: [string, any]) => (
+                      <div key={field} className="flex justify-between text-sm">
+                        <span className="text-brand-charcoal/60">{field}:</span>
+                        <span className="font-bold text-brand-plum">{csvColumn}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {csvAnalysis.analysis.sampleData && csvAnalysis.analysis.sampleData.length > 0 && (
+                  <div className="bg-white p-6 border-2 border-brand-plum/20 mb-6 max-h-64 overflow-y-auto">
+                    <div className="text-sm font-mono uppercase tracking-widest text-brand-charcoal/60 mb-3">
+                      Sample Data (First 3 Rows)
+                    </div>
+                    <div className="space-y-3">
+                      {csvAnalysis.analysis.sampleData.slice(0, 3).map((row: any, idx: number) => (
+                        <div key={idx} className="p-3 bg-brand-bone text-xs">
+                          <div><strong>Company:</strong> {row.companyName || "N/A"}</div>
+                          <div><strong>Contact:</strong> {row.contactName || "N/A"}</div>
+                          <div><strong>Phone:</strong> {row.contactPhone || "N/A"}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleImportCSV}
+                    disabled={isUploading}
+                    className="flex-1 px-6 py-3 bg-green-600 text-white font-mono text-sm uppercase tracking-widest font-bold hover:bg-green-700 border-2 border-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isUploading ? "Importing..." : `Import ${csvAnalysis.totalRows} Prospects`}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCsvAnalysis(null);
+                      setUploadFile(null);
+                    }}
+                    disabled={isUploading}
+                    className="px-6 py-3 border-2 border-brand-plum text-brand-plum font-mono text-sm uppercase tracking-widest hover:bg-brand-plum hover:text-brand-bone transition-all disabled:opacity-50"
+                  >
+                    Back
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowUploadModal(false);
+                      setUploadFile(null);
+                      setCsvAnalysis(null);
+                    }}
+                    disabled={isUploading}
+                    className="px-6 py-3 border-2 border-brand-plum text-brand-plum font-mono text-sm uppercase tracking-widest hover:bg-brand-plum hover:text-brand-bone transition-all disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>
