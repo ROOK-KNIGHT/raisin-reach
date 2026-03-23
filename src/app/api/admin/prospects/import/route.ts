@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     // Create a set of existing prospect keys
     const existingKeys = new Set(
       existingProspects.map(
-        (p) => `${p.companyName}|${p.contactPhone || ""}|${p.contactEmail || ""}`
+        (p: any) => `${p.companyName}|${p.contactPhone || ""}|${p.contactEmail || ""}`
       )
     );
 
