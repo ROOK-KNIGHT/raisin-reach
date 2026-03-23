@@ -69,10 +69,18 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Error analyzing CSV:", error);
+    
+    // Log the full error for debugging
+    if (error instanceof Error) {
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+    }
+    
     return NextResponse.json(
       {
         error: "Failed to analyze CSV file",
         details: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
       },
       { status: 500 }
     );
