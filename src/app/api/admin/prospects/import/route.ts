@@ -111,7 +111,7 @@ export async function POST(request: Request) {
           sourceDetail: row.sourceDetail || null,
           tags: row.tags || [],
           notes: row.notes || null,
-          status: "NEW",
+          status: "NEW" as const,
           readinessScore: 0,
         }));
 
