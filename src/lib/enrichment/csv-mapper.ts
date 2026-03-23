@@ -7,10 +7,6 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.Claude_API_Key,
-});
-
 export interface ColumnMapping {
   [csvColumn: string]: string; // CSV column name → Prospect field name
 }
@@ -34,6 +30,16 @@ export async function analyzeCSVFormat(
   fileContent: string,
   fileName: string
 ): Promise<CSVAnalysisResult> {
+  const apiKey = process.env.Claude_API_Key;
+
+  if (!apiKey) {
+    throw new Error("Claude_API_Key is not configured in environment variables");
+  }
+
+  const anthropic = new Anthropic({
+    apiKey,
+  });
+
   // Extract first 50 lines for analysis
   const lines = fileContent.split("\n").slice(0, 50);
   const sample = lines.join("\n");
