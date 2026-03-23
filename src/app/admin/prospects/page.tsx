@@ -176,6 +176,16 @@ export default function ProspectsPage() {
 
       if (response.ok) {
         const data = await response.json();
+        
+        // Build skip reasons summary
+        let skipReasons = '';
+        if (data.skippedRows && data.skippedRows.length > 0) {
+          skipReasons = '\n\nFirst 5 skip reasons:\n';
+          data.skippedRows.slice(0, 5).forEach((skip: any) => {
+            skipReasons += `Row ${skip.rowNumber}: ${skip.reason}\n`;
+          });
+        }
+        
         alert(
           `Import complete!\n\n` +
           `Total rows: ${data.stats.totalRows}\n` +
@@ -183,7 +193,8 @@ export default function ProspectsPage() {
           `Skipped: ${data.stats.skipped}\n` +
           `Duplicates in file: ${data.stats.duplicatesInFile}\n` +
           `Duplicates in database: ${data.stats.duplicatesInDatabase}\n` +
-          `Errors: ${data.stats.errors}`
+          `Errors: ${data.stats.errors}` +
+          skipReasons
         );
         
         // Close modal and refresh
