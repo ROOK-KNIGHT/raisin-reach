@@ -312,6 +312,14 @@ export function parseCSVWithMapping(
       const row: any = {};
       let hasCompanyName = false;
 
+      // Debug logging for first row
+      if (i === analysis.skipRows + 1) {
+        console.log("DEBUG - First data row:");
+        console.log("- Headers:", headers);
+        console.log("- Values:", values);
+        console.log("- Column mapping:", analysis.columnMapping);
+      }
+
       headers.forEach((header, idx) => {
         const prospectField = analysis.columnMapping[header];
         if (prospectField && values[idx]) {
