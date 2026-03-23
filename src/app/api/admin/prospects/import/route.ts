@@ -43,10 +43,11 @@ export async function POST(request: Request) {
     const fileContent = await file.text();
 
     // Parse CSV with mapping and validation
-    const { validRows, skippedRows, stats } = parseCSVWithMapping(
+    const parseResult = parseCSVWithMapping(
       fileContent,
       analysis
     );
+    const { validRows, skippedRows, stats } = parseResult;
 
     // Log for debugging
     console.log("CSV Import Debug:");
@@ -154,6 +155,10 @@ export async function POST(request: Request) {
       },
       skippedRows: skippedRows.slice(0, 50), // Return first 50 skipped rows for review
       errors: errors.slice(0, 20), // Return first 20 errors for review
+      debugInfo: (validRows.length === 0 && skippedRows.length > 0) ? {
+        message: "All rows were skipped. Debug info:",
+        ...parseResult.debugInfo
+      } : undefined,
     });
   } catch (error) {
     console.error("Error importing CSV:", error);

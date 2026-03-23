@@ -185,6 +185,16 @@ export default function ProspectsPage() {
             skipReasons += `Row ${skip.rowNumber}: ${skip.reason}\n`;
           });
         }
+
+        // Build debug info if present
+        let debugInfo = '';
+        if (data.debugInfo) {
+          debugInfo = '\n\n=== DEBUG INFO ===\n';
+          debugInfo += `Raw header: ${data.debugInfo.rawHeaderLine}\n`;
+          debugInfo += `Parsed headers: ${JSON.stringify(data.debugInfo.parsedHeaders)}\n`;
+          debugInfo += `Mapping keys: ${JSON.stringify(data.debugInfo.mappingKeys)}\n`;
+          debugInfo += `First 3 lines:\n${data.debugInfo.firstThreeLines.join('\n')}`;
+        }
         
         alert(
           `Import complete!\n\n` +
@@ -194,7 +204,8 @@ export default function ProspectsPage() {
           `Duplicates in file: ${data.stats.duplicatesInFile}\n` +
           `Duplicates in database: ${data.stats.duplicatesInDatabase}\n` +
           `Errors: ${data.stats.errors}` +
-          skipReasons
+          skipReasons +
+          debugInfo
         );
         
         // Close modal and refresh

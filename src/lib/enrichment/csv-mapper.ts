@@ -256,6 +256,12 @@ export function parseCSVWithMapping(
     skipped: number;
     duplicates: number;
   };
+  debugInfo?: {
+    rawHeaderLine: string;
+    parsedHeaders: string[];
+    mappingKeys: string[];
+    firstThreeLines: string[];
+  };
 } {
   // Strip BOM (Byte Order Mark) if present
   fileContent = fileContent.replace(/^\uFEFF/, '');
@@ -266,6 +272,20 @@ export function parseCSVWithMapping(
   const lines = fileContent.split("\n");
   const headerLine = lines[analysis.headerRow];
   const headers = parseCSVLine(headerLine);
+
+  // Debug info to return
+  const debugInfo = {
+    rawHeaderLine: headerLine,
+    parsedHeaders: headers,
+    mappingKeys: Object.keys(analysis.columnMapping),
+    firstThreeLines: lines.slice(0, 3),
+  };
+
+  console.log("=== CSV PARSING DEBUG ===");
+  console.log("Raw header line:", headerLine);
+  console.log("Parsed headers:", headers);
+  console.log("Mapping keys:", Object.keys(analysis.columnMapping));
+  console.log("First 3 lines:", lines.slice(0, 3));
 
   const validRows: any[] = [];
   const skippedRows: Array<{ rowNumber: number; reason: string; content: string }> = [];
@@ -386,5 +406,6 @@ export function parseCSVWithMapping(
       skipped: skippedRows.length,
       duplicates: skippedRows.filter((r) => r.reason === "Duplicate entry").length,
     },
+    debugInfo,
   };
 }
