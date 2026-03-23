@@ -40,6 +40,9 @@ export async function analyzeCSVFormat(
     apiKey,
   });
 
+  // Strip BOM (Byte Order Mark) if present
+  fileContent = fileContent.replace(/^\uFEFF/, '');
+  
   // Normalize line endings (handle Windows \r\n and Mac \r)
   fileContent = fileContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
@@ -254,6 +257,9 @@ export function parseCSVWithMapping(
     duplicates: number;
   };
 } {
+  // Strip BOM (Byte Order Mark) if present
+  fileContent = fileContent.replace(/^\uFEFF/, '');
+  
   // Normalize line endings (handle Windows \r\n and Mac \r)
   fileContent = fileContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   
