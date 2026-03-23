@@ -114,7 +114,8 @@ export async function searchYelpBusinesses(
   const apiKey = process.env.YELP_API_KEY;
 
   if (!apiKey) {
-    throw new Error("YELP_API_KEY is not configured");
+    console.warn("YELP_API_KEY is not configured - skipping Yelp enrichment");
+    return [];
   }
 
   try {
@@ -132,14 +133,15 @@ export async function searchYelpBusinesses(
     });
 
     if (!response.ok) {
-      throw new Error(`Yelp API error: ${response.status} ${response.statusText}`);
+      console.error(`Yelp API error: ${response.status} ${response.statusText}`);
+      return [];
     }
 
     const data = await response.json();
     return data.businesses || [];
   } catch (error) {
     console.error("Error searching Yelp businesses:", error);
-    throw error;
+    return [];
   }
 }
 
@@ -152,7 +154,8 @@ export async function getYelpBusinessDetails(
   const apiKey = process.env.YELP_API_KEY;
 
   if (!apiKey) {
-    throw new Error("YELP_API_KEY is not configured");
+    console.warn("YELP_API_KEY is not configured - skipping Yelp details");
+    return null;
   }
 
   try {
@@ -165,14 +168,15 @@ export async function getYelpBusinessDetails(
     });
 
     if (!response.ok) {
-      throw new Error(`Yelp API error: ${response.status} ${response.statusText}`);
+      console.error(`Yelp API error: ${response.status} ${response.statusText}`);
+      return null;
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
     console.error("Error fetching Yelp business details:", error);
-    throw error;
+    return null;
   }
 }
 
@@ -186,7 +190,8 @@ export async function getYelpBusinessReviews(
   const apiKey = process.env.YELP_API_KEY;
 
   if (!apiKey) {
-    throw new Error("YELP_API_KEY is not configured");
+    console.warn("YELP_API_KEY is not configured - skipping Yelp reviews");
+    return [];
   }
 
   try {
@@ -201,14 +206,15 @@ export async function getYelpBusinessReviews(
     });
 
     if (!response.ok) {
-      throw new Error(`Yelp API error: ${response.status} ${response.statusText}`);
+      console.error(`Yelp API error: ${response.status} ${response.statusText}`);
+      return [];
     }
 
     const data = await response.json();
     return data.reviews || [];
   } catch (error) {
     console.error("Error fetching Yelp reviews:", error);
-    throw error;
+    return [];
   }
 }
 

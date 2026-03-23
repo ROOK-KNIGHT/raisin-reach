@@ -74,7 +74,15 @@ export async function generateSalesIntelligence(
     });
 
     // Extract the response
-    const responseText = message.content[0].type === "text" ? message.content[0].text : "";
+    let responseText = message.content[0].type === "text" ? message.content[0].text : "";
+    
+    // Clean up the response - remove markdown code blocks if present
+    responseText = responseText.trim();
+    if (responseText.startsWith("```json")) {
+      responseText = responseText.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+    } else if (responseText.startsWith("```")) {
+      responseText = responseText.replace(/^```\s*/, "").replace(/\s*```$/, "");
+    }
     
     // Parse the JSON response
     const intelligence = JSON.parse(responseText) as SalesIntelligence;

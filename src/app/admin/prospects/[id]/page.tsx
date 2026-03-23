@@ -97,7 +97,7 @@ export default function ProspectDetailPage() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Review started:", data);
+        console.log("Review completed:", data);
         
         // Simulate progress
         const interval = setInterval(() => {
@@ -106,17 +106,24 @@ export default function ProspectDetailPage() {
               clearInterval(interval);
               setIsReviewing(false);
               setShowReviewModal(false);
-              alert(`Review complete! Enriched ${prospect.companyName} with data from 6 sources.`);
+              
+              // Reload prospect data to show enriched information
+              window.location.reload();
               return 100;
             }
             return prev + 10;
           });
         }, 500);
+      } else {
+        const errorData = await response.json();
+        console.error("Review failed:", errorData);
+        setIsReviewing(false);
+        alert(`Failed to enrich prospect: ${errorData.error || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Error running review:", error);
       setIsReviewing(false);
-      alert("Failed to start review");
+      alert("Failed to start review. Please check the console for details.");
     }
   };
 

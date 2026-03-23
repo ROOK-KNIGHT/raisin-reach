@@ -52,7 +52,7 @@ interface GooglePlaceDetails {
 }
 
 /**
- * Search for places using Google Places Text Search API
+ * Search for places using Google Places Text Search API (New)
  */
 export async function searchGooglePlaces(
   query: string,
@@ -61,31 +61,60 @@ export async function searchGooglePlaces(
   const apiKey = process.env.GOOGLE_PLACES_API_KEY;
 
   if (!apiKey) {
-    throw new Error("GOOGLE_PLACES_API_KEY is not configured");
+    console.warn("GOOGLE_PLACES_API_KEY is not configured - skipping Google Places enrichment");
+    return [];
   }
 
   try {
     const searchQuery = location ? `${query} in ${location}` : query;
-    const url = new URL("https://maps.googleapis.com/maps/api/place/textsearch/json");
-    url.searchParams.append("query", searchQuery);
-    url.searchParams.append("key", apiKey);
+    
+    // Use the new Places API (New) - Text Search endpoint
+    const url = "https://places.googleapis.com/v1/places:searchText";
+    
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": apiKey,
+        "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.types,places.businessStatus",
+      },
+      body: JSON.stringify({
+        textQuery: searchQuery,
+      }),
+    });
 
-    const response = await fetch(url.toString());
     const data = await response.json();
 
-    if (data.status !== "OK" && data.status !== "ZERO_RESULTS") {
-      throw new Error(`Google Places API error: ${data.status} - ${data.error_message || "Unknown error"}`);
+    if (!response.ok) {
+      console.error(`Google Places API error: ${response.status}`, data);
+      return [];
     }
 
-    return data.results || [];
+    // Transform new API response to match old format
+    const places = data.places || [];
+    return places.map((place: any) => ({
+      place_id: place.id,
+      name: place.displayName?.text || "",
+      formatted_address: place.formattedAddress || "",
+      geometry: {
+        location: {
+          lat: place.location?.latitude || 0,
+          lng: place.location?.longitude || 0,
+        },
+      },
+      rating: place.rating,
+      user_ratings_total: place.userRatingCount,
+      types: place.types || [],
+      business_status: place.businessStatus,
+    }));
   } catch (error) {
     console.error("Error searching Google Places:", error);
-    throw error;
+    return [];
   }
 }
 
 /**
- * Get detailed information about a specific place
+ * Get detailed information about a specific place using new Places API
  */
 export async function getGooglePlaceDetails(
   placeId: string
@@ -93,26 +122,63 @@ export async function getGooglePlaceDetails(
   const apiKey = process.env.GOOGLE_PLACES_API_KEY;
 
   if (!apiKey) {
-    throw new Error("GOOGLE_PLACES_API_KEY is not configured");
+    console.warn("GOOGLE_PLACES_API_KEY is not configured - skipping Google Places details");
+    return null;
   }
 
   try {
-    const url = new URL("https://maps.googleapis.com/maps/api/place/details/json");
-    url.searchParams.append("place_id", placeId);
-    url.searchParams.append("fields", "place_id,name,formatted_address,formatted_phone_number,international_phone_number,website,rating,user_ratings_total,reviews,opening_hours,types,business_status,url,geometry");
-    url.searchParams.append("key", apiKey);
+    // Use the new Places API (New) - Get Place endpoint
+    const url = `https://places.googleapis.com/v1/${placeId}`;
+    
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": apiKey,
+        "X-Goog-FieldMask": "id,displayName,formattedAddress,nationalPhoneNumber,internationalPhoneNumber,websiteUri,rating,userRatingCount,reviews,regularOpeningHours,types,businessStatus,googleMapsUri,location",
+      },
+    });
 
-    const response = await fetch(url.toString());
     const data = await response.json();
 
-    if (data.status !== "OK") {
-      throw new Error(`Google Places API error: ${data.status} - ${data.error_message || "Unknown error"}`);
+    if (!response.ok) {
+      console.error(`Google Places API error: ${response.status}`, data);
+      return null;
     }
 
-    return data.result || null;
+    // Transform new API response to match old format
+    return {
+      place_id: data.id,
+      name: data.displayName?.text || "",
+      formatted_address: data.formattedAddress || "",
+      formatted_phone_number: data.nationalPhoneNumber,
+      international_phone_number: data.internationalPhoneNumber,
+      website: data.websiteUri,
+      rating: data.rating,
+      user_ratings_total: data.userRatingCount,
+      reviews: data.reviews?.map((review: any) => ({
+        author_name: review.authorAttribution?.displayName || "Anonymous",
+        rating: review.rating || 0,
+        text: review.text?.text || "",
+        time: new Date(review.publishTime).getTime() / 1000,
+      })),
+      opening_hours: data.regularOpeningHours ? {
+        weekday_text: data.regularOpeningHours.weekdayDescriptions || [],
+        open_now: data.regularOpeningHours.openNow || false,
+      } : undefined,
+      types: data.types || [],
+      business_status: data.businessStatus,
+      url: data.googleMapsUri,
+      geometry: {
+        location: {
+          lat: data.location?.latitude || 0,
+          lng: data.location?.longitude || 0,
+        },
+      },
+    };
   } catch (error) {
     console.error("Error fetching Google Place details:", error);
-    throw error;
+    return null;
   }
 }
 
