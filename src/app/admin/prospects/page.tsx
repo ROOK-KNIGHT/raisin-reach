@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Prospect {
   id: string;
@@ -21,90 +21,6 @@ interface Prospect {
   createdAt: string;
 }
 
-// Mock data for demonstration
-const mockProspects: Prospect[] = [
-  {
-    id: "1",
-    companyName: "ABC Plumbing Services",
-    contactName: "John Smith",
-    contactTitle: "Owner",
-    contactEmail: "john@abcplumbing.com",
-    contactPhone: "(555) 123-4567",
-    industry: "Plumbing",
-    location: "Sacramento, CA",
-    source: "American Home Shield",
-    readinessScore: 85,
-    status: "QUALIFIED",
-    assignedClient: null,
-    tags: ["Licensed", "5+ Years", "High Rating"],
-    createdAt: "2026-03-18T10:00:00Z",
-  },
-  {
-    id: "2",
-    companyName: "Elite HVAC Solutions",
-    contactName: "Sarah Johnson",
-    contactTitle: "CEO",
-    contactEmail: "sarah@elitehvac.com",
-    contactPhone: "(555) 234-5678",
-    industry: "HVAC",
-    location: "Los Angeles, CA",
-    source: "Angi",
-    readinessScore: 92,
-    status: "NEW",
-    assignedClient: null,
-    tags: ["Licensed", "BBB A+", "10+ Years"],
-    createdAt: "2026-03-19T14:30:00Z",
-  },
-  {
-    id: "3",
-    companyName: "Quick Fix Electrical",
-    contactName: "Mike Davis",
-    contactTitle: "Master Electrician",
-    contactEmail: "mike@quickfixelectric.com",
-    contactPhone: "(555) 345-6789",
-    industry: "Electrical",
-    location: "San Diego, CA",
-    source: "Yelp",
-    readinessScore: 78,
-    status: "RESEARCHING",
-    assignedClient: null,
-    tags: ["Licensed", "Emergency Service"],
-    createdAt: "2026-03-17T09:15:00Z",
-  },
-  {
-    id: "4",
-    companyName: "Pro Roofing Co",
-    contactName: "David Martinez",
-    contactTitle: "Operations Manager",
-    contactEmail: "david@proroofing.com",
-    contactPhone: "(555) 456-7890",
-    industry: "Roofing",
-    location: "San Francisco, CA",
-    source: "BBB",
-    readinessScore: 65,
-    status: "NEW",
-    assignedClient: null,
-    tags: ["Licensed", "Insured"],
-    createdAt: "2026-03-16T11:45:00Z",
-  },
-  {
-    id: "5",
-    companyName: "Sunshine Landscaping",
-    contactName: "Maria Garcia",
-    contactTitle: "Owner",
-    contactEmail: "maria@sunshinelandscape.com",
-    contactPhone: "(555) 567-8901",
-    industry: "Landscaping",
-    location: "Oakland, CA",
-    source: "Thumbtack",
-    readinessScore: 45,
-    status: "DISQUALIFIED",
-    assignedClient: null,
-    tags: ["No License Info"],
-    createdAt: "2026-03-15T16:20:00Z",
-  },
-];
-
 export default function ProspectsPage() {
   const { data: session } = useSession();
   const user = session?.user as any || { name: "Admin User" };
@@ -112,11 +28,34 @@ export default function ProspectsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterSource, setFilterSource] = useState("all");
-  const [prospects] = useState<Prospect[]>(mockProspects);
+  const [prospects, setProspects] = useState<Prospect[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedProspects, setSelectedProspects] = useState<string[]>([]);
   const [isReviewing, setIsReviewing] = useState(false);
   const [reviewProgress, setReviewProgress] = useState(0);
+
+  // Fetch prospects on mount
+  useEffect(() => {
+    fetchProspects();
+  }, []);
+
+  const fetchProspects = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("/api/admin/prospects");
+      if (response.ok) {
+        const data = await response.json();
+        setProspects(data);
+      } else {
+        console.error("Failed to fetch prospects");
+      }
+    } catch (error) {
+      console.error("Error fetching prospects:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const toggleProspectSelection = (prospectId: string) => {
     setSelectedProspects(prev => 
@@ -158,22 +97,19 @@ export default function ProspectsPage() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Review started:", data);
+        console.log("Review complete:", data);
         
-        // Simulate progress
-        const interval = setInterval(() => {
-          setReviewProgress((prev) => {
-            if (prev >= 100) {
-              clearInterval(interval);
-              setIsReviewing(false);
-              setShowReviewModal(false);
-              setSelectedProspects([]);
-              alert(`Review complete! Enriched ${selectedProspects.length} prospects with data from 6 sources.`);
-              return 100;
-            }
-            return prev + 10;
-          });
-        }, 500);
+        // Close modal and refresh prospects
+        setIsReviewing(false);
+        setShowReviewModal(false);
+        setSelectedProspects([]);
+        
+        // Refresh the prospects list to show updated data
+        await fetchProspects();
+        
+        alert(`Review complete! Enriched ${data.successful} of ${data.totalProcessed} prospects.`);
+      } else {
+        throw new Error("Review failed");
       }
     } catch (error) {
       console.error("Error running review:", error);
@@ -612,43 +548,17 @@ export default function ProspectsPage() {
               <div className="py-8">
                 <div className="text-center mb-6">
                   <div className="text-4xl font-display font-bold text-brand-plum mb-2">
-                    {reviewProgress}%
+                    ⏳
                   </div>
                   <p className="text-brand-charcoal/80 font-mono uppercase tracking-widest">
-                    Scraping in progress...
+                    Enriching prospects...
+                  </p>
+                  <p className="text-sm text-brand-charcoal/60 mt-2">
+                    This may take 30-60 seconds per prospect
                   </p>
                 </div>
-                <div className="w-full bg-brand-bone h-4 mb-4">
-                  <div
-                    className="bg-green-600 h-4 transition-all duration-500"
-                    style={{ width: `${reviewProgress}%` }}
-                  ></div>
-                </div>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="p-3 bg-brand-bone">
-                    <span className="font-mono text-brand-charcoal/60">Website:</span>
-                    <span className="ml-2 text-green-600">✓ Scanning</span>
-                  </div>
-                  <div className="p-3 bg-brand-bone">
-                    <span className="font-mono text-brand-charcoal/60">LinkedIn:</span>
-                    <span className="ml-2 text-green-600">✓ Scanning</span>
-                  </div>
-                  <div className="p-3 bg-brand-bone">
-                    <span className="font-mono text-brand-charcoal/60">Facebook:</span>
-                    <span className="ml-2 text-green-600">✓ Scanning</span>
-                  </div>
-                  <div className="p-3 bg-brand-bone">
-                    <span className="font-mono text-brand-charcoal/60">Twitter/X:</span>
-                    <span className="ml-2 text-green-600">✓ Scanning</span>
-                  </div>
-                  <div className="p-3 bg-brand-bone">
-                    <span className="font-mono text-brand-charcoal/60">Yelp:</span>
-                    <span className="ml-2 text-green-600">✓ Scanning</span>
-                  </div>
-                  <div className="p-3 bg-brand-bone">
-                    <span className="font-mono text-brand-charcoal/60">Google:</span>
-                    <span className="ml-2 text-green-600">✓ Scanning</span>
-                  </div>
+                <div className="flex justify-center">
+                  <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-brand-plum"></div>
                 </div>
               </div>
             )}
