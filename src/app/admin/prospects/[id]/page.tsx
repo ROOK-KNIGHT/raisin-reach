@@ -35,42 +35,14 @@ interface Client {
   email: string;
 }
 
-// Mock data
-const mockProspect: Prospect = {
-  id: "1",
-  companyName: "ABC Plumbing Services",
-  contactName: "John Smith",
-  contactTitle: "Owner",
-  contactEmail: "john@abcplumbing.com",
-  contactPhone: "(555) 123-4567",
-  website: "https://abcplumbing.com",
-  linkedinUrl: "https://linkedin.com/company/abc-plumbing",
-  industry: "Plumbing",
-  companySize: "10-50 employees",
-  location: "Sacramento, CA",
-  source: "American Home Shield",
-  sourceDetail: "Contractor directory - verified provider",
-  readinessScore: 85,
-  status: "QUALIFIED",
-  assignedClient: null,
-  tags: ["Licensed", "5+ Years", "High Rating", "Emergency Service"],
-  notes: "Strong online presence. BBB A+ rating. Specializes in residential plumbing.",
-  createdAt: "2026-03-18T10:00:00Z",
-};
-
-const mockClients: Client[] = [
-  { id: "1", name: "Raisin Reach", company: "Raisin Reach", email: "admin@raisinreach.com" },
-  { id: "2", name: "John Doe", company: "Doe Enterprises", email: "john@doe.com" },
-  { id: "3", name: "Jane Smith", company: "Smith Corp", email: "jane@smith.com" },
-];
-
 export default function ProspectDetailPage() {
   const { data: session } = useSession();
   const user = session?.user as any || { name: "Admin User" };
   const params = useParams();
   
-  const [prospect] = useState<Prospect>(mockProspect);
-  const [clients] = useState<Client[]>(mockClients);
+  const [prospect, setProspect] = useState<Prospect | null>(null);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedClient, setSelectedClient] = useState<string>("");
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showConvertModal, setShowConvertModal] = useState(false);
@@ -78,7 +50,38 @@ export default function ProspectDetailPage() {
   const [isReviewing, setIsReviewing] = useState(false);
   const [reviewProgress, setReviewProgress] = useState(0);
 
+  // Fetch prospect data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Fetch prospect
+        const prospectRes = await fetch(`/api/admin/prospects/${params.id}`);
+        if (prospectRes.ok) {
+          const prospectData = await prospectRes.json();
+          setProspect(prospectData);
+        }
+        
+        // Fetch clients
+        const clientsRes = await fetch('/api/admin/clients');
+        if (clientsRes.ok) {
+          const clientsData = await clientsRes.json();
+          setClients(clientsData);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [params.id]);
+
   const handleRunReview = async () => {
+    if (!prospect) return;
+    
     setIsReviewing(true);
     setReviewProgress(0);
 
@@ -249,7 +252,27 @@ export default function ProspectDetailPage() {
           </Link>
         </div>
 
+        {/* Loading State */}
+        {isLoading && (
+          <div className="bg-white border-2 border-brand-plum p-12 text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-brand-plum mx-auto mb-4"></div>
+            <p className="text-brand-charcoal/60 font-mono uppercase tracking-widest">Loading prospect...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {!isLoading && !prospect && (
+          <div className="bg-white border-2 border-red-500 p-12 text-center">
+            <p className="text-red-500 font-mono uppercase tracking-widest mb-4">Prospect not found</p>
+            <Link href="/admin/prospects" className="px-6 py-3 bg-brand-plum text-brand-bone font-mono text-sm uppercase tracking-widest hover:bg-brand-gold hover:text-brand-plum border-2 border-brand-plum transition-all inline-block">
+              Back to Prospects
+            </Link>
+          </div>
+        )}
+
         {/* Header Section */}
+        {!isLoading && prospect && (
+        <>
         <div className="bg-white border-2 border-brand-plum p-6 mb-8 shadow-[4px_4px_0px_0px_var(--color-brand-plum)]">
           <div className="flex justify-between items-start mb-4">
             <div className="flex-1">
@@ -462,6 +485,8 @@ export default function ProspectDetailPage() {
             </div>
           </div>
         </div>
+        </>
+        )}
       </div>
 
       {/* Assign Modal */}
@@ -509,7 +534,7 @@ export default function ProspectDetailPage() {
       )}
 
       {/* Run Review Modal */}
-      {showReviewModal && (
+      {showReviewModal && prospect && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white border-4 border-brand-plum p-8 max-w-2xl w-full mx-4">
             <h3 className="text-2xl font-display font-bold text-brand-plum uppercase mb-4">
