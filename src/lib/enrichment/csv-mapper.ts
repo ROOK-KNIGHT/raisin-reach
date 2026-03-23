@@ -18,11 +18,11 @@ export interface ColumnMapping {
 export interface CSVAnalysisResult {
   skipRows: number; // Number of rows to skip at the beginning (disclaimers, etc.)
   headerRow: number; // Which row contains the actual column headers
-  mapping: ColumnMapping;
+  columnMapping: ColumnMapping; // Changed from 'mapping' to 'columnMapping'
   source: string; // Detected source (e.g., "CSLB", "Yelp", "Manual")
   sourceDetail?: string;
   expectedColumnCount: number;
-  sampleRows: any[]; // 5 sample rows with mapping applied
+  sampleData: any[]; // Changed from 'sampleRows' to 'sampleData'
   confidence: "HIGH" | "MEDIUM" | "LOW";
 }
 
@@ -43,7 +43,7 @@ export async function analyzeCSVFormat(
 {
   "skipRows": <number of junk/disclaimer rows at the top to skip>,
   "headerRow": <which row number (0-indexed) contains the actual column headers>,
-  "mapping": {
+  "columnMapping": {
     "<CSV Column Name>": "<Prospect Field Name>",
     ...
   },
@@ -127,7 +127,7 @@ Return ONLY valid JSON, no markdown formatting.`;
 
       // Apply mapping
       headers.forEach((header, idx) => {
-        const prospectField = analysis.mapping[header];
+        const prospectField = analysis.columnMapping[header];
         if (prospectField && values[idx]) {
           row[prospectField] = values[idx];
         }
@@ -137,7 +137,7 @@ Return ONLY valid JSON, no markdown formatting.`;
     }
   }
 
-  analysis.sampleRows = sampleRows;
+  analysis.sampleData = sampleRows;
 
   return analysis;
 }
@@ -295,7 +295,7 @@ export function parseCSVWithMapping(
       let hasCompanyName = false;
 
       headers.forEach((header, idx) => {
-        const prospectField = analysis.mapping[header];
+        const prospectField = analysis.columnMapping[header];
         if (prospectField && values[idx]) {
           const value = values[idx].trim();
 
