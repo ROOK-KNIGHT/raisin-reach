@@ -48,6 +48,14 @@ export async function POST(request: Request) {
       analysis
     );
 
+    // Log for debugging
+    console.log("CSV Import Debug:");
+    console.log("- Total rows:", stats.total);
+    console.log("- Valid rows:", stats.valid);
+    console.log("- Skipped rows:", stats.skipped);
+    console.log("- First skipped row:", skippedRows[0]);
+    console.log("- First valid row:", validRows[0]);
+
     // Check for existing prospects to avoid duplicates
     const existingProspects = await prisma.prospect.findMany({
       where: {
