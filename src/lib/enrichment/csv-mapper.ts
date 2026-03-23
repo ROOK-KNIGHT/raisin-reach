@@ -40,6 +40,9 @@ export async function analyzeCSVFormat(
     apiKey,
   });
 
+  // Normalize line endings (handle Windows \r\n and Mac \r)
+  fileContent = fileContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
   // Extract first 50 lines for analysis
   const lines = fileContent.split("\n").slice(0, 50);
   const sample = lines.join("\n");
@@ -251,6 +254,9 @@ export function parseCSVWithMapping(
     duplicates: number;
   };
 } {
+  // Normalize line endings (handle Windows \r\n and Mac \r)
+  fileContent = fileContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  
   const lines = fileContent.split("\n");
   const headerLine = lines[analysis.headerRow];
   const headers = parseCSVLine(headerLine);
