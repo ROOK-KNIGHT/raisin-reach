@@ -65,6 +65,18 @@ export async function analyzeCSVFormat(
   "confidence": "HIGH" | "MEDIUM" | "LOW"
 }
 
+CRITICAL RULES FOR headerRow:
+1. The headerRow MUST be the line that contains the actual column names (e.g., "BusinessName,Address,City,State,ZipCode,License,PhoneNumber")
+2. Do NOT point to empty separator rows (e.g., ",,,,,,")
+3. Do NOT point to disclaimer text or metadata
+4. The headerRow line should contain text that matches the keys you put in columnMapping
+5. Example: If you see this CSV:
+   Line 0: "Below is a randomly generated list..."
+   Line 1: ",,,,,,,"  ← SKIP THIS (empty separator)
+   Line 2: "BusinessName,Address,City,State,ZipCode,License,PhoneNumber"  ← THIS IS THE HEADER
+   Line 3: "ABC Plumbing,123 Main St,Sacramento,CA,95814,C-36,555-1234"
+   Then: skipRows=2, headerRow=2 (both point to line 2, everything before is skipped)
+
 Available Prospect fields to map to:
 - companyName (required)
 - website
@@ -270,21 +282,49 @@ export function parseCSVWithMapping(
   fileContent = fileContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   
   const lines = fileContent.split("\n");
-  const headerLine = lines[analysis.headerRow];
-  const headers = parseCSVLine(headerLine);
+  
+  // FALLBACK: Auto-detect correct header row if AI got it wrong
+  let actualHeaderRow = analysis.headerRow;
+  let headerLine = lines[actualHeaderRow];
+  let headers = parseCSVLine(headerLine);
+  
+  // Check if parsed headers match the mapping keys
+  const mappingKeys = Object.keys(analysis.columnMapping);
+  const headersMatchMapping = headers.some(h => mappingKeys.includes(h));
+  
+  if (!headersMatchMapping) {
+    console.log("⚠️ AI headerRow doesn't match mapping keys. Auto-detecting correct header...");
+    
+    // Scan through lines to find the one that contains the mapping keys
+    for (let i = 0; i < Math.min(20, lines.length); i++) {
+      const testLine = lines[i];
+      const testHeaders = parseCSVLine(testLine);
+      const matchCount = testHeaders.filter(h => mappingKeys.includes(h)).length;
+      
+      if (matchCount >= mappingKeys.length * 0.5) { // At least 50% of mapping keys found
+        actualHeaderRow = i;
+        headerLine = testLine;
+        headers = testHeaders;
+        console.log(`✓ Found correct header at row ${i}:`, headers);
+        break;
+      }
+    }
+  }
 
   // Debug info to return
   const debugInfo = {
     rawHeaderLine: headerLine,
     parsedHeaders: headers,
-    mappingKeys: Object.keys(analysis.columnMapping),
+    mappingKeys,
     firstThreeLines: lines.slice(0, 3),
+    correctedHeaderRow: actualHeaderRow !== analysis.headerRow ? actualHeaderRow : undefined,
   };
 
   console.log("=== CSV PARSING DEBUG ===");
+  console.log("AI headerRow:", analysis.headerRow, "→ Actual headerRow:", actualHeaderRow);
   console.log("Raw header line:", headerLine);
   console.log("Parsed headers:", headers);
-  console.log("Mapping keys:", Object.keys(analysis.columnMapping));
+  console.log("Mapping keys:", mappingKeys);
   console.log("First 3 lines:", lines.slice(0, 3));
 
   const validRows: any[] = [];
@@ -302,8 +342,11 @@ export function parseCSVWithMapping(
   }
   const avgRowLength = totalLength / sampleSize;
 
+  // Use corrected header row for data processing
+  const dataStartRow = actualHeaderRow;
+  
   // Process each data row
-  for (let i = analysis.skipRows + 1; i < lines.length; i++) {
+  for (let i = dataStartRow + 1; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) {
       skippedRows.push({
