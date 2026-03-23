@@ -148,7 +148,9 @@ export default function ProspectsPage() {
         setCsvAnalysis(data);
       } else {
         const error = await response.json();
-        alert(`Failed to analyze CSV: ${error.error || "Unknown error"}`);
+        const errorMessage = error.details || error.error || "Unknown error";
+        alert(`Failed to analyze CSV:\n\n${errorMessage}`);
+        console.error("Full error:", error);
       }
     } catch (error) {
       console.error("Error analyzing CSV:", error);
