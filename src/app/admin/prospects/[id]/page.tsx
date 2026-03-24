@@ -26,6 +26,9 @@ interface Prospect {
   tags: string[];
   notes: string | null;
   createdAt: string;
+  salesIntelligence?: any;
+  aiConfidence?: "HIGH" | "MEDIUM" | "LOW";
+  lastEnrichedAt?: string;
 }
 
 interface Client {
@@ -428,9 +431,9 @@ export default function ProspectDetailPage() {
           <div className="space-y-8">
             {/* AI Sales Intelligence Panel */}
             <SalesIntelligencePanel
-              intelligence={null}
-              aiConfidence={undefined}
-              lastEnrichedAt={undefined}
+              intelligence={prospect.salesIntelligence}
+              aiConfidence={prospect.aiConfidence}
+              lastEnrichedAt={prospect.lastEnrichedAt}
             />
 
             {/* Readiness Score Breakdown */}
