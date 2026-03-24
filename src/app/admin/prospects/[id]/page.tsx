@@ -153,14 +153,73 @@ export default function ProspectDetailPage() {
     return 'bg-red-100';
   };
 
-  const scoreBreakdown = [
-    { category: "Data Completeness", score: 22, max: 25, description: "Has email, phone, website, LinkedIn" },
-    { category: "Industry Fit", score: 25, max: 25, description: "Perfect match for home services" },
-    { category: "Company Size Match", score: 12, max: 15, description: "Within ideal range (10-50)" },
-    { category: "Recency", score: 8, max: 10, description: "Added 2 days ago" },
-    { category: "Source Quality", score: 10, max: 10, description: "Verified directory (AHS)" },
-    { category: "Engagement Signals", score: 8, max: 15, description: "Active website, no recent engagement" },
-  ];
+  // Calculate score breakdown dynamically
+  const calculateScoreBreakdown = (prospect: Prospect) => {
+    const breakdown = [];
+    
+    // Data Completeness (max 25)
+    let dataScore = 0;
+    if (prospect.contactEmail) dataScore += 7;
+    if (prospect.contactPhone) dataScore += 7;
+    if (prospect.website) dataScore += 6;
+    if (prospect.linkedinUrl) dataScore += 5;
+    breakdown.push({
+      category: "Data Completeness",
+      score: dataScore,
+      max: 25,
+      description: `${[prospect.contactEmail && 'email', prospect.contactPhone && 'phone', prospect.website && 'website', prospect.linkedinUrl && 'LinkedIn'].filter(Boolean).join(', ') || 'Limited data'}`
+    });
+    
+    // Industry Fit (max 25)
+    const industryScore = prospect.industry ? 25 : 10;
+    breakdown.push({
+      category: "Industry Fit",
+      score: industryScore,
+      max: 25,
+      description: prospect.industry ? `${prospect.industry} industry` : "Industry not specified"
+    });
+    
+    // Company Size Match (max 15)
+    const sizeScore = prospect.companySize ? 15 : 5;
+    breakdown.push({
+      category: "Company Size Match",
+      score: sizeScore,
+      max: 15,
+      description: prospect.companySize || "Size not specified"
+    });
+    
+    // Recency (max 10)
+    const daysOld = Math.floor((Date.now() - new Date(prospect.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+    const recencyScore = Math.max(0, 10 - Math.floor(daysOld / 7));
+    breakdown.push({
+      category: "Recency",
+      score: recencyScore,
+      max: 10,
+      description: `Added ${daysOld} day${daysOld !== 1 ? 's' : ''} ago`
+    });
+    
+    // Source Quality (max 10)
+    const sourceScore = prospect.source === 'MANUAL' ? 10 : prospect.source === 'CSV_IMPORT' ? 8 : 5;
+    breakdown.push({
+      category: "Source Quality",
+      score: sourceScore,
+      max: 10,
+      description: prospect.sourceDetail || prospect.source
+    });
+    
+    // Engagement Signals (max 15)
+    const engagementScore = (prospect.website ? 8 : 0) + (prospect.linkedinUrl ? 7 : 0);
+    breakdown.push({
+      category: "Engagement Signals",
+      score: engagementScore,
+      max: 15,
+      description: prospect.website ? "Active online presence" : "Limited online presence"
+    });
+    
+    return breakdown;
+  };
+
+  const scoreBreakdown = prospect ? calculateScoreBreakdown(prospect) : [];
 
   const handleAssign = () => {
     console.log("Assigning prospect to client:", selectedClient);
