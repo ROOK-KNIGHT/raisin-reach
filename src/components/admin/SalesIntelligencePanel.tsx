@@ -113,7 +113,7 @@ export default function SalesIntelligencePanel({
           💬 Conversation Starters
         </h4>
         <div className="space-y-3">
-          {intelligence.conversationStarters.map((starter, idx) => (
+          {Array.isArray(intelligence.conversationStarters) && intelligence.conversationStarters.map((starter, idx) => (
             <div key={idx} className="p-4 bg-brand-bone border-l-4 border-brand-gold">
               <div className="flex items-start gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-brand-plum text-brand-bone rounded-full flex items-center justify-center text-xs font-bold">
@@ -132,7 +132,7 @@ export default function SalesIntelligencePanel({
           🔥 Industry Pain Points
         </h4>
         <ul className="space-y-2">
-          {intelligence.industryPainPoints.map((point, idx) => (
+          {Array.isArray(intelligence.industryPainPoints) && intelligence.industryPainPoints.map((point, idx) => (
             <li key={idx} className="flex items-start gap-3">
               <span className="text-brand-gold text-xl">•</span>
               <span className="text-brand-charcoal">{point}</span>
@@ -147,7 +147,7 @@ export default function SalesIntelligencePanel({
           ⚠️ Specific Challenges
         </h4>
         <ul className="space-y-2">
-          {intelligence.specificChallenges.map((challenge, idx) => (
+          {Array.isArray(intelligence.specificChallenges) && intelligence.specificChallenges.map((challenge, idx) => (
             <li key={idx} className="flex items-start gap-3">
               <span className="text-red-500 text-xl">•</span>
               <span className="text-brand-charcoal">{challenge}</span>
@@ -162,7 +162,7 @@ export default function SalesIntelligencePanel({
           🛡️ Objection Handling
         </h4>
         <div className="space-y-4">
-          {intelligence.objectionPrep.map((obj, idx) => (
+          {Array.isArray(intelligence.objectionPrep) && intelligence.objectionPrep.map((obj, idx) => (
             <div key={idx} className="border-2 border-brand-plum/20 p-4">
               <div className="mb-2">
                 <span className="text-xs font-mono uppercase tracking-widest text-red-600 font-bold">
@@ -182,7 +182,7 @@ export default function SalesIntelligencePanel({
       </div>
 
       {/* Competitive Insights */}
-      {intelligence.competitiveInsights && intelligence.competitiveInsights.length > 0 && (
+      {Array.isArray(intelligence.competitiveInsights) && intelligence.competitiveInsights.length > 0 && (
         <div className="bg-white border-2 border-brand-plum p-6">
           <h4 className="text-xl font-display font-bold text-brand-plum uppercase mb-3">
             🏆 Competitive Insights
@@ -199,7 +199,7 @@ export default function SalesIntelligencePanel({
       )}
 
       {/* Urgency Signals */}
-      {intelligence.urgencySignals && intelligence.urgencySignals.length > 0 && (
+      {Array.isArray(intelligence.urgencySignals) && intelligence.urgencySignals.length > 0 && (
         <div className="bg-white border-2 border-brand-plum p-6">
           <h4 className="text-xl font-display font-bold text-brand-plum uppercase mb-3">
             ⏰ Urgency Signals
