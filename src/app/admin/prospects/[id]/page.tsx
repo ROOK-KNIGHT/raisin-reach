@@ -70,7 +70,7 @@ export default function ProspectDetailPage() {
         const clientsRes = await fetch('/api/admin/clients');
         if (clientsRes.ok) {
           const clientsData = await clientsRes.json();
-          setClients(clientsData);
+          setClients(clientsData.clients || []);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
