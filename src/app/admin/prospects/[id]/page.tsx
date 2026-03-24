@@ -297,7 +297,7 @@ export default function ProspectDetailPage() {
                 {prospect.contactTitle && ` • ${prospect.contactTitle}`}
               </div>
               <div className="flex gap-2 mb-3">
-                {prospect.tags.map((tag, idx) => (
+                {Array.isArray(prospect.tags) && prospect.tags.map((tag, idx) => (
                   <span key={idx} className="px-3 py-1 bg-brand-bone text-brand-plum text-sm font-mono border border-brand-plum/20">
                     {tag}
                   </span>
