@@ -48,9 +48,9 @@ const Hero = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-5xl md:text-8xl font-display font-bold mb-6 tracking-tight leading-none"
         >
-          You've tried the agencies. <br />
-          Bought the lists. <br />
-          <span className="text-brand-gold">and probably are right where you started.</span>
+          You didn't start your business <br />
+          to chase leads, post on Instagram, <br />
+          <span className="text-brand-gold">and fight with your website.</span>
         </motion.h1>
 
         <motion.p 
@@ -59,7 +59,7 @@ const Hero = () => {
           transition={{ delay: 0.5, duration: 0.8 }}
           className="text-lg md:text-2xl font-sans max-w-3xl mx-auto mb-12 text-brand-bone/80"
         >
-          The lead gen industry is designed to sell you hope and deliver spreadsheets. We built Raisin Reach because your business deserves better than that.
+          You started it to build something. Raisin Reach helps you grow — we fill your pipeline, streamline your operations, and give you the tools to run smarter.
         </motion.p>
 
         <motion.div 
@@ -134,37 +134,37 @@ const HowWereDifferent = () => {
           How We're Different.
         </h2>
         <p className="text-xl text-brand-charcoal/70 text-center max-w-3xl mx-auto mb-16">
-          The lead gen industry has a dirty secret: they sell volume, not value. We built something better.
+          Most companies sell you pieces. We built the whole system.
         </p>
 
         <div className="grid md:grid-cols-3 gap-8">
           {/* Block 1 */}
           <div className="p-8 border border-brutalist bg-brand-bone/50 shadow-[4px_4px_0px_0px_var(--color-brand-gold)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200">
             <h3 className="text-2xl font-display font-bold text-brand-plum mb-4 uppercase">
-              AI-Powered, Human-Verified
+              AI + Human Intelligence
             </h3>
             <p className="text-brand-charcoal/80 leading-relaxed">
-              We don't hand you a list and call it "leads." Our AI scans thousands of prospects across multiple lines of business, filters for fit, and pre-qualifies every single one. Then a real person vets them — before they ever earn the title of "lead."
+              Our AI scans, our people verify, and our platform tracks it all. You get the speed of automation with the precision of human judgment — and full visibility into every step.
             </p>
           </div>
 
           {/* Block 2 */}
           <div className="p-8 border border-brutalist bg-brand-bone/50 shadow-[4px_4px_0px_0px_var(--color-brand-gold)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200">
             <h3 className="text-2xl font-display font-bold text-brand-plum mb-4 uppercase">
-              We Learn Their Business. Then We Learn Yours.
+              One Partner. Every System.
             </h3>
             <p className="text-brand-charcoal/80 leading-relaxed">
-              Every prospect is different. We study their needs, understand how their business works, and craft a targeted, personalized approach — not a template, not a script. A conversation designed specifically for them and for you.
+              Instead of duct-taping five vendors together, we help you centralize sales, marketing, and operations into one streamlined system. One login. One team. One mission.
             </p>
           </div>
 
           {/* Block 3 */}
           <div className="p-8 border border-brutalist bg-brand-bone/50 shadow-[4px_4px_0px_0px_var(--color-brand-gold)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200">
             <h3 className="text-2xl font-display font-bold text-brand-plum mb-4 uppercase">
-              We're Not a Vendor. We're Your Sales Team.
+              They Build a Relationship With You
             </h3>
             <p className="text-brand-charcoal/80 leading-relaxed">
-              Your prospects don't build a relationship with Raisin Reach. They build a relationship with you. We show up as your team, represent your brand, and grow your business like it's our own — because that's exactly what a real partner does.
+              Your prospects don't build a relationship with Raisin Reach. They build a relationship with you. We work under your brand, represent your business, and disappear into the background — exactly where a good partner should be.
             </p>
           </div>
         </div>
@@ -197,15 +197,101 @@ export default function Home() {
 
       <HowWereDifferent />
 
-      {/* Operations / Growth Engine Section */}
-      <section id="operations" className="py-24 bg-brand-bone text-brand-plum">
+      {/* Two Arms, One Mission - Tandem Section */}
+      <section id="tandem" className="py-24 bg-brand-bone text-brand-plum">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-4xl md:text-6xl font-display font-bold mb-4 text-center text-brand-plum">
-            More Than Leads. A Full Growth Engine.
+            Two Arms. One Mission.
           </h2>
           <p className="text-xl text-brand-charcoal/70 text-center max-w-3xl mx-auto mb-16">
-            Sales is just the beginning. We built an entire operations platform around your business — so you can focus on what you do best, and we handle the rest.
+            We fill your pipeline. We streamline your workflow. You focus on what you do best.
           </p>
+
+          {/* Two-Column Layout: Sales + Operations */}
+          <div className="grid md:grid-cols-2 gap-12 mb-12">
+            {/* LEFT PILLAR: Sales */}
+            <div className="bg-white border-2 border-brand-plum p-8 shadow-[8px_8px_0px_0px_var(--color-brand-plum)]">
+              <h3 className="text-3xl font-display font-bold text-brand-plum mb-6 uppercase text-center">
+                We Fill Your Pipeline
+              </h3>
+              <div className="space-y-4 font-sans text-brand-charcoal">
+                <p className="leading-relaxed text-center mb-6">
+                  We help you systemize what matters — sales, outreach, and lead qualification — so your business runs cleaner while you focus on closing.
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span><strong>AI-powered prospecting</strong> with human verification</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span><strong>Personalized outreach</strong> — no scripts, no templates</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span><strong>We show up as YOUR team</strong> — prospects build relationships with you</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span><strong>Qualified appointments, guaranteed</strong> — BANT-verified decision-makers</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* RIGHT PILLAR: Operations */}
+            <div className="bg-white border-2 border-brand-plum p-8 shadow-[8px_8px_0px_0px_var(--color-brand-plum)]">
+              <h3 className="text-3xl font-display font-bold text-brand-plum mb-6 uppercase text-center">
+                We Streamline Your Operations
+              </h3>
+              <div className="space-y-4 font-sans text-brand-charcoal">
+                <p className="leading-relaxed text-center mb-6">
+                  We give you the tools to track, manage, and grow — CRM, financials, social media, and more — all in one place.
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span><strong>Custom CRM</strong> to track every lead, email, note, and project</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span><strong>Profit estimator</strong> so you can see real-time net profit</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span><strong>Social media automation</strong> across Facebook, Instagram, and X</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span><strong>In-house photography & development</strong> for websites, AI agents, and more</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Connecting Bar */}
+          <div className="bg-brand-plum text-brand-bone p-8 md:p-12 text-center border-2 border-brand-gold shadow-[8px_8px_0px_0px_var(--color-brand-gold)]">
+            <p className="text-xl md:text-2xl font-sans leading-relaxed">
+              Most companies hire a sales team <strong className="text-brand-gold">AND</strong> a marketing agency <strong className="text-brand-gold">AND</strong> an IT consultant <strong className="text-brand-gold">AND</strong> a photographer. <br />
+              We put it all in one place because growth shouldn't require five different vendors.
+            </p>
+            <Link 
+              href="/what-we-offer" 
+              className="inline-block mt-6 text-brand-gold underline decoration-brand-gold/50 hover:decoration-brand-gold underline-offset-4 font-mono uppercase text-sm tracking-widest"
+            >
+              See the Full Picture →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Detailed Capabilities Grid (Optional - can remove if too much) */}
+      <section id="capabilities" className="py-24 bg-white text-brand-plum">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-3xl md:text-4xl font-display font-bold mb-12 text-center text-brand-plum uppercase">
+            The Tools We Give You
+          </h2>
 
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             {/* Card 1: CRM */}

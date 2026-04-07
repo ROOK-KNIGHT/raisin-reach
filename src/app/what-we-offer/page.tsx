@@ -14,10 +14,10 @@ export default function WhatWeOffer() {
       {/* Hero */}
       <section className="pt-32 pb-24 px-6 bg-brand-plum text-brand-bone text-center">
         <h1 className="text-5xl md:text-7xl font-display font-bold mb-8 uppercase tracking-tighter">
-          What We <span className="text-brand-gold">Offer.</span>
+          Everything Your Business Needs to Grow. <span className="text-brand-gold">Under One Roof.</span>
         </h1>
         <p className="text-xl md:text-2xl font-sans max-w-3xl mx-auto opacity-90">
-          One service. Done right. No packages, no tiers, no upsells.
+          Sales. Operations. Technology. Marketing. All working together, all working for you.
         </p>
       </section>
 
