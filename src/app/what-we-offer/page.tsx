@@ -314,6 +314,198 @@ export default function WhatWeOffer() {
         </div>
       </section>
 
+      {/* Operations & Platform Section */}
+      <section className="py-24 bg-brand-bone border-y border-brutalist">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-4xl md:text-6xl font-display font-bold text-brand-plum mb-4 text-center uppercase">
+            Operations & Platform
+          </h2>
+          <p className="text-xl text-brand-charcoal/70 text-center max-w-3xl mx-auto mb-16">
+            Sales is just the beginning. We built an entire operations platform around your business.
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-12 mb-16">
+            {/* CRM */}
+            <div className="bg-white border-2 border-brand-plum p-8 shadow-[8px_8px_0px_0px_var(--color-brand-plum)]">
+              <h3 className="text-2xl font-display font-bold text-brand-plum mb-6 uppercase">Your Own CRM — Built for You</h3>
+              <div className="space-y-4 font-sans text-brand-charcoal">
+                <p className="leading-relaxed">
+                  Track every lead, send emails, set goals, add notes, and manage projects — all from one place. No more spreadsheets. No more guessing where things stand.
+                </p>
+                <ul className="space-y-2 ml-6">
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Lead tracking with full conversation history</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Email integration for seamless communication</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Goal setting and progress tracking</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Notes and project management in one system</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Profit Estimator */}
+            <div className="bg-white border-2 border-brand-plum p-8 shadow-[8px_8px_0px_0px_var(--color-brand-plum)]">
+              <h3 className="text-2xl font-display font-bold text-brand-plum mb-6 uppercase">Profit Estimator — Know Your Numbers</h3>
+              <div className="space-y-4 font-sans text-brand-charcoal">
+                <p className="leading-relaxed">
+                  A built-in tool to track your costs, overhead, and see estimated net profit in real time. Make smarter decisions with real data, not gut feelings.
+                </p>
+                <ul className="space-y-2 ml-6">
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Real-time cost tracking and overhead management</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Estimated net profit calculations</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Project profitability analysis</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Data-driven decision making tools</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Social Media */}
+            <div className="bg-white border-2 border-brand-plum p-8 shadow-[8px_8px_0px_0px_var(--color-brand-plum)]">
+              <h3 className="text-2xl font-display font-bold text-brand-plum mb-6 uppercase">Social Media on Autopilot</h3>
+              <div className="space-y-4 font-sans text-brand-charcoal">
+                <p className="leading-relaxed">
+                  We automate your posts across Facebook, Instagram, and X (Twitter). Consistent presence without you lifting a finger. Your brand stays active while you stay focused.
+                </p>
+                <ul className="space-y-2 ml-6">
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Automated posting across Facebook, Instagram, and X</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Content calendar management</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Consistent brand presence without manual work</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Analytics and engagement tracking</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Photography */}
+            <div className="bg-white border-2 border-brand-plum p-8 shadow-[8px_8px_0px_0px_var(--color-brand-plum)]">
+              <h3 className="text-2xl font-display font-bold text-brand-plum mb-6 uppercase">Professional Photography — In-House</h3>
+              <div className="space-y-4 font-sans text-brand-charcoal">
+                <p className="leading-relaxed">
+                  No more stock photos or phone snaps. Our in-house photographer delivers professional images that make your brand look as good as your work actually is.
+                </p>
+                <ul className="space-y-2 ml-6">
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Professional photography services</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Brand-aligned visual content</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Project documentation and portfolio building</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Social media and marketing assets</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Development */}
+            <div className="bg-white border-2 border-brand-plum p-8 shadow-[8px_8px_0px_0px_var(--color-brand-plum)]">
+              <h3 className="text-2xl font-display font-bold text-brand-plum mb-6 uppercase">Developers on Your Team</h3>
+              <div className="space-y-4 font-sans text-brand-charcoal">
+                <p className="leading-relaxed">
+                  Need a website update? A custom AI agent built for your workflow? Our in-house development team builds the tools your business needs to run smarter.
+                </p>
+                <ul className="space-y-2 ml-6">
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Website updates and maintenance</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Custom AI agents for workflow automation</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Business tool development</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Technical support and optimization</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Client Portal */}
+            <div className="bg-white border-2 border-brand-plum p-8 shadow-[8px_8px_0px_0px_var(--color-brand-plum)]">
+              <h3 className="text-2xl font-display font-bold text-brand-plum mb-6 uppercase">100% Transparent Client Portal</h3>
+              <div className="space-y-4 font-sans text-brand-charcoal">
+                <p className="leading-relaxed">
+                  Everything you need — leads, projects, reports, goals — visible from your dashboard. No hidden work. No black boxes. Total transparency, tailored for you.
+                </p>
+                <ul className="space-y-2 ml-6">
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Centralized dashboard for all business operations</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Real-time lead and project visibility</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Comprehensive reporting and analytics</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-brand-gold font-bold mt-1">→</span>
+                    <span>Complete transparency into all activities</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Closing Message */}
+          <div className="bg-brand-plum text-brand-bone p-12 border-2 border-brand-gold shadow-[12px_12px_0px_0px_var(--color-brand-gold)]">
+            <p className="text-2xl font-sans text-center leading-relaxed mb-6">
+              You're not hiring a vendor. You're gaining a team.
+            </p>
+            <p className="text-xl font-sans text-center leading-relaxed text-brand-bone/90">
+              <strong className="text-brand-gold">Sales, marketing, photography, development, and operations</strong> — all working under your brand, for your growth. Your prospects don't build a relationship with Raisin Reach. They build a relationship with <strong className="text-brand-gold">you</strong>.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-32 bg-brand-gold text-brand-plum text-center px-6">
         <div className="max-w-4xl mx-auto">

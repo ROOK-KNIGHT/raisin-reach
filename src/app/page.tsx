@@ -74,6 +74,9 @@ const Hero = () => {
           <Link href="#calculator" className="text-brand-gold underline decoration-brand-gold/50 hover:decoration-brand-gold underline-offset-4 font-mono uppercase text-sm tracking-widest">
             See What You Might Leaving Behind
           </Link>
+          <Link href="/what-we-offer" className="text-brand-bone underline decoration-brand-bone/50 hover:decoration-brand-bone underline-offset-4 font-mono uppercase text-sm tracking-widest">
+            See Everything We Offer →
+          </Link>
         </motion.div>
       </div>
     </section>
@@ -193,6 +196,93 @@ export default function Home() {
       </section>
 
       <HowWereDifferent />
+
+      {/* Operations / Growth Engine Section */}
+      <section id="operations" className="py-24 bg-brand-bone text-brand-plum">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-4xl md:text-6xl font-display font-bold mb-4 text-center text-brand-plum">
+            More Than Leads. A Full Growth Engine.
+          </h2>
+          <p className="text-xl text-brand-charcoal/70 text-center max-w-3xl mx-auto mb-16">
+            Sales is just the beginning. We built an entire operations platform around your business — so you can focus on what you do best, and we handle the rest.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            {/* Card 1: CRM */}
+            <div className="p-8 border border-brutalist bg-white shadow-[4px_4px_0px_0px_var(--color-brand-plum)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200">
+              <h3 className="text-2xl font-display font-bold text-brand-plum mb-4 uppercase">
+                Your Own CRM — Built for You
+              </h3>
+              <p className="text-brand-charcoal/80 leading-relaxed">
+                Track every lead, send emails, set goals, add notes, and manage projects — all from one place. No more spreadsheets. No more guessing where things stand.
+              </p>
+            </div>
+
+            {/* Card 2: Profit Estimator */}
+            <div className="p-8 border border-brutalist bg-white shadow-[4px_4px_0px_0px_var(--color-brand-plum)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200">
+              <h3 className="text-2xl font-display font-bold text-brand-plum mb-4 uppercase">
+                Profit Estimator — Know Your Numbers
+              </h3>
+              <p className="text-brand-charcoal/80 leading-relaxed">
+                A built-in tool to track your costs, overhead, and see estimated net profit in real time. Make smarter decisions with real data, not gut feelings.
+              </p>
+            </div>
+
+            {/* Card 3: Social Media */}
+            <div className="p-8 border border-brutalist bg-white shadow-[4px_4px_0px_0px_var(--color-brand-plum)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200">
+              <h3 className="text-2xl font-display font-bold text-brand-plum mb-4 uppercase">
+                Social Media on Autopilot
+              </h3>
+              <p className="text-brand-charcoal/80 leading-relaxed">
+                We automate your posts across Facebook, Instagram, and X (Twitter). Consistent presence without you lifting a finger. Your brand stays active while you stay focused.
+              </p>
+            </div>
+
+            {/* Card 4: Photography */}
+            <div className="p-8 border border-brutalist bg-white shadow-[4px_4px_0px_0px_var(--color-brand-plum)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200">
+              <h3 className="text-2xl font-display font-bold text-brand-plum mb-4 uppercase">
+                Professional Photography — In-House
+              </h3>
+              <p className="text-brand-charcoal/80 leading-relaxed">
+                No more stock photos or phone snaps. Our in-house photographer delivers professional images that make your brand look as good as your work actually is.
+              </p>
+            </div>
+
+            {/* Card 5: Development */}
+            <div className="p-8 border border-brutalist bg-white shadow-[4px_4px_0px_0px_var(--color-brand-plum)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200">
+              <h3 className="text-2xl font-display font-bold text-brand-plum mb-4 uppercase">
+                Developers on Your Team
+              </h3>
+              <p className="text-brand-charcoal/80 leading-relaxed">
+                Need a website update? A custom AI agent built for your workflow? Our in-house development team builds the tools your business needs to run smarter.
+              </p>
+            </div>
+
+            {/* Card 6: Client Portal */}
+            <div className="p-8 border border-brutalist bg-white shadow-[4px_4px_0px_0px_var(--color-brand-plum)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-200">
+              <h3 className="text-2xl font-display font-bold text-brand-plum mb-4 uppercase">
+                100% Transparent Client Portal
+              </h3>
+              <p className="text-brand-charcoal/80 leading-relaxed">
+                Everything you need — leads, projects, reports, goals — visible from your dashboard. No hidden work. No black boxes. Total transparency, tailored for you.
+              </p>
+            </div>
+          </div>
+
+          {/* Closing Callout */}
+          <div className="bg-brand-plum text-brand-bone p-8 md:p-12 text-center border-2 border-brand-gold shadow-[8px_8px_0px_0px_var(--color-brand-gold)]">
+            <p className="text-xl md:text-2xl font-sans leading-relaxed">
+              You're not hiring a service. You're gaining a team — <strong className="text-brand-gold">sales, marketing, photography, development, and operations</strong> — all working under your brand, for your growth.
+            </p>
+            <Link 
+              href="/what-we-offer" 
+              className="inline-block mt-6 text-brand-gold underline decoration-brand-gold/50 hover:decoration-brand-gold underline-offset-4 font-mono uppercase text-sm tracking-widest"
+            >
+              See the Full Picture →
+            </Link>
+          </div>
+        </div>
+      </section>
 
       <section id="calculator" className="py-24 bg-brand-bone relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-6 relative z-10">
