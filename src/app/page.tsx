@@ -48,9 +48,8 @@ const Hero = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-5xl md:text-8xl font-display font-bold mb-6 tracking-tight leading-none"
         >
-          You didn't start your business <br />
-          to chase leads, post on Instagram, <br />
-          <span className="text-brand-gold">and fight with your website.</span>
+          You started your business <br />
+          <span className="text-brand-gold">to build something.</span>
         </motion.h1>
 
         <motion.p 
@@ -59,7 +58,7 @@ const Hero = () => {
           transition={{ delay: 0.5, duration: 0.8 }}
           className="text-lg md:text-2xl font-sans max-w-3xl mx-auto mb-12 text-brand-bone/80"
         >
-          You started it to build something. Raisin Reach helps you grow — we fill your pipeline, streamline your operations, and give you the tools to run smarter.
+          Raisin Reach helps you grow — we fill your pipeline, streamline your operations, and give you the tools to run smarter.
         </motion.p>
 
         <motion.div 
