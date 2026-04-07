@@ -7,23 +7,23 @@ import clsx from "clsx";
 const PILLARS = [
   {
     id: "intelligence",
-    title: "Deep Intelligence",
-    description: "Researching the 'Ungettable' Lead.",
+    title: "We Learn Your World",
+    description: "Before we pick up a phone, we study your market, your buyers, and what keeps them up at night.",
   },
   {
     id: "interrupt",
-    title: "The Pattern Interrupt",
-    description: "The first 7 seconds of the call.",
+    title: "We Earn the Conversation",
+    description: "No tricks. No scripts. Just the right message to the right person at the right time.",
   },
   {
     id: "value",
-    title: "Value Intersection",
-    description: "Aligning pain with the Reach method.",
+    title: "We Connect the Dots",
+    description: "We align what you solve with what they need — so the conversation feels natural, not forced.",
   },
   {
     id: "lock",
-    title: "The Calendar Lock",
-    description: "The guaranteed appointment.",
+    title: "We Fill Your Calendar",
+    description: "Real appointments. Real decision-makers. Not leads on a spreadsheet — people ready to talk.",
   },
 ];
 
